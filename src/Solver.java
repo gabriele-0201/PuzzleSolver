@@ -3,10 +3,12 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 
 public class Solver {
 
-    public static Stirng endBoard;
+    public static String endBoard;
+    public static int boardSize;
 
     public static void main(String[] args) {
 
@@ -19,7 +21,6 @@ public class Solver {
         }
 
         String boardInputString = null;
-        int boardSize = 0;
 
         try {
             File file = new File(fileName);
@@ -28,39 +29,66 @@ public class Solver {
             reader.nextLine();
             boardInputString = reader.nextLine();
             reader.close();
-        } catch (Exception e) {
+        } catch (FileNotFoundException e) {
             System.out.println("File Not Found!");
         }
 
-        setEndBoard(boardSize);
+        setEndBoard();
 
-        int[][] tiles = getTiles(boardSize, boardInputString);
+        //HAVE TO TEST MANHATTAN
 
-        Board firstBoard = new Board(tiles);
+
+        boolean endFound = false;
+
+        //Create the first node with zero moves
+        Node node = new Node(boardInputString, null, 0); 
+        System.out.println(node.getBoard().manhattan());
+        endFound = node.checkEnd();
+
+        /*
+        PriorityQueue<Node> que = new PriorityQueue<>();
+        que.add(node);
+
+        while(endFound) {
+            node = que.poll();
+
+            LinkedList<Node> sons = node.getSons();
+
+            for(Node s : sons) {
+                que.add(s); 
+                
+                endFound = node.checkEnd();
+                if(endFound){
+                    node = s;
+                    break;
+                } 
+            }
+        }
+
+        System.out.println(node.getMoves());
+
+        LinkedList<String> strBoards = new LinkedList<>();
+
+        while(node.getPrevious() != null) {
+            strBoards.add(node.getBoard().toString());
+            node = node.getPrevious();
+        }
+
+        while(!strBoards.isEmpty()) {
+            System.out.println(strBoards.removeLast());
+        }*/
 
         
     }
 
-    private static int[][] getTiles(int size, String board) {
-        String[] chars = board.split(" ");
-        int[][] tiles = new int[size][size];
-        int i = 0;
-        int j = 0;
-        for(String c : chars) {
-            tiles[i][j++] = Integer.parseInt(c);
-
-            if(j >= size) {
-                i++;
-                j = 0;
-            }
+    private static void setEndBoard() {
+        int n = boardSize * boardSize;
+        StringBuilder s = new StringBuilder();
+        for(int i = 1; i <= n; i++) {
+            s.append(i);
+            s.append(" ");
         }
-        return tiles;
-    }
-
-    private static void setEndBoard(int size) {
-        int n = size * size;
-        for(int i = 1; i <= size; i++) {
-            
-        }
+        s.append("0");
+        endBoard = s.toString();
     }
 }
