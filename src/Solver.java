@@ -35,29 +35,40 @@ public class Solver {
 
         setEndBoard();
 
-        //HAVE TO TEST MANHATTAN
+        System.out.println("endBoard: " + endBoard);
 
+        //HAVE TO TEST MANHATTAN
 
         boolean endFound = false;
 
         //Create the first node with zero moves
         Node node = new Node(boardInputString, null, 0); 
-        System.out.println(node.getBoard().manhattan());
+        
         endFound = node.checkEnd();
 
-        /*
         PriorityQueue<Node> que = new PriorityQueue<>();
         que.add(node);
 
-        while(endFound) {
+        int i = 0;
+
+        while(!endFound) {
+            //System.out.println("gen: " + i++);
+            System.out.println("que size: " + que.size());
+
             node = que.poll();
 
             LinkedList<Node> sons = node.getSons();
 
+            System.out.println("Ded: " + node.getBoard().toString());
+            //System.out.println("sons: ");
+
             for(Node s : sons) {
+
+                //System.out.println(s.getBoard().toString());
+
                 que.add(s); 
                 
-                endFound = node.checkEnd();
+                endFound = s.checkEnd();
                 if(endFound){
                     node = s;
                     break;
@@ -65,18 +76,18 @@ public class Solver {
             }
         }
 
-        System.out.println(node.getMoves());
+        //System.out.println(node.getMoves());
 
         LinkedList<String> strBoards = new LinkedList<>();
 
-        while(node.getPrevious() != null) {
+        while(node != null) {
             strBoards.add(node.getBoard().toString());
             node = node.getPrevious();
         }
 
         while(!strBoards.isEmpty()) {
             System.out.println(strBoards.removeLast());
-        }*/
+        }
 
         
     }
@@ -84,11 +95,12 @@ public class Solver {
     private static void setEndBoard() {
         int n = boardSize * boardSize;
         StringBuilder s = new StringBuilder();
-        for(int i = 1; i <= n; i++) {
+        for(int i = 1; i < n; i++) {
             s.append(i);
             s.append(" ");
         }
         s.append("0");
+        s.append(" ");
         endBoard = s.toString();
     }
 }

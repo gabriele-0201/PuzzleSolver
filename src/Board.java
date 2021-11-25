@@ -46,7 +46,7 @@ public class Board {
         }
 
         if(!(zeroPos[1] - 1 < 0)) {
-           sons.add(getNewBoard(tiles[zeroPos[0]][zeroPos[0] - 1]));
+           sons.add(getNewBoard(tiles[zeroPos[0]][zeroPos[1] - 1]));
         }
 
         if(!(zeroPos[1] + 1 >= Solver.boardSize)) {
@@ -71,6 +71,7 @@ public class Board {
                     s.append(0);
                 else
                     s.append(tiles[i][j]);
+               s.append(" ");
             }
         }
         return s.toString();

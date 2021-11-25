@@ -7,11 +7,13 @@ public class Node implements Comparable<Node>{
     private Node previous;
     private Board board;
     private int moves;
+    private int score;
 
     public Node(String strBoard, Node previous, int moves) {
         this.previous = previous;
         this.board = new Board(getTiles(strBoard));
         this.moves = moves;
+        score = this.board.manhattan() + this.moves;
     }
 
     public Node getPrevious() {
@@ -27,18 +29,18 @@ public class Node implements Comparable<Node>{
     }
 
     public boolean checkEnd() {
-        return Solver.endBoard == this.board.toString();
+        return Solver.endBoard.equals(this.board.toString());
     }
 
     @Override
     public int compareTo(Node o) {
-        int v1 = this.board.manhattan() * this.moves;
-        int v2 = o.board.manhattan() * o.moves;
+        int v1 = this.score;
+        int v2 = o.score;
 
         if(v1 < v2) 
-            return -1;
-        else if(v1 > v2)
             return 1;
+        else if(v1 > v2)
+            return -1;
         return 0;
     }
 
