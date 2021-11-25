@@ -4,10 +4,19 @@ public class Board {
 
     private int[][] tiles;
     private int[] zeroPos;
+    private int prevMoved;
 
     public Board(int[][] tiles) {
         this.tiles = tiles;
         zeroPos = findZero();
+    }
+
+    public void setPrevMoved(int m) {
+        prevMoved = m;
+    }
+
+    public int getPrevMoved() {
+        return prevMoved;
     }
 
     public String toString() {
@@ -34,22 +43,22 @@ public class Board {
         return sum;
     }
 
-    public LinkedList<String> getMoves() {
-        LinkedList<String> sons = new LinkedList<String>();
+    public LinkedList<StringBuilder> getMoves() {
+        LinkedList<StringBuilder> sons = new LinkedList<>();
         
-        if(!(zeroPos[0] - 1 < 0)) {
+        if(!(zeroPos[0] - 1 < 0) && tiles[zeroPos[0] - 1][zeroPos[1]] != prevMoved) {
            sons.add(getNewBoard(tiles[zeroPos[0] - 1][zeroPos[1]]));
         }
 
-        if(!(zeroPos[0] + 1 >= Solver.boardSize)) {
+        if(!(zeroPos[0] + 1 >= Solver.boardSize) && tiles[zeroPos[0] + 1][zeroPos[1]] != prevMoved) {
            sons.add(getNewBoard(tiles[zeroPos[0] + 1][zeroPos[1]]));
         }
 
-        if(!(zeroPos[1] - 1 < 0)) {
+        if(!(zeroPos[1] - 1 < 0) && tiles[zeroPos[0]][zeroPos[1] - 1] != prevMoved) {
            sons.add(getNewBoard(tiles[zeroPos[0]][zeroPos[1] - 1]));
         }
 
-        if(!(zeroPos[1] + 1 >= Solver.boardSize)) {
+        if(!(zeroPos[1] + 1 >= Solver.boardSize) && tiles[zeroPos[0]][zeroPos[1] + 1] != prevMoved) {
            sons.add(getNewBoard(tiles[zeroPos[0]][zeroPos[1] + 1]));
         }
 
@@ -61,8 +70,9 @@ public class Board {
     }
 
     // This function return the new String with the swapped values
-    private String getNewBoard(int v) {
+    private StringBuilder getNewBoard(int v) {
         StringBuilder s = new StringBuilder();
+        s.append(v);
         for(int i = 0; i < Solver.boardSize; i++) {
             for(int j = 0; j < Solver.boardSize; j++) {
                 if(tiles[i][j] == 0)
@@ -71,11 +81,10 @@ public class Board {
                     s.append(0);
                 else
                     s.append(tiles[i][j]);
-               s.append(" ");
+                s.append(" ");
             }
         }
-        return s.toString();
-
+        return s;
     }
 
     private int[] findZero() {

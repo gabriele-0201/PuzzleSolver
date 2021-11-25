@@ -1,6 +1,7 @@
+import java.lang.module.ModuleDescriptor.Builder;
 import java.util.LinkedList;
 
-import javax.swing.event.ListDataEvent;
+import javax.print.attribute.standard.NumberUpSupported;
 
 public class Node implements Comparable<Node>{
 
@@ -10,8 +11,8 @@ public class Node implements Comparable<Node>{
     private int score;
 
     public Node(String strBoard, Node previous, int moves) {
-        this.previous = previous;
         this.board = new Board(getTiles(strBoard));
+        this.previous = previous;
         this.moves = moves;
         score = this.board.manhattan() + this.moves;
     }
@@ -46,14 +47,29 @@ public class Node implements Comparable<Node>{
 
     public LinkedList<Node> getSons() {
         LinkedList<Node> sons = new LinkedList<>();
-        LinkedList<String> moves = board.getMoves();
+        LinkedList<StringBuilder> moves = board.getMoves();
+        LinkedList<Integer> prevMoves = extractNum(moves);
+
+        //LinkedList<String> moves = board.getMoves();
+
         int sonsMoves = this.moves + 1;
 
-        for(String m : moves) {
-            sons.add(new Node(m, this, sonsMoves));
+        for(int i = 0; i < moves.size(); i++) {
+            Node n = new Node(moves.get(i).toString(), this, sonsMoves);
+            n.getBoard().setPrevMoved(prevMoves.get(i));
+            sons.add(n);
         }
 
         return sons;
+    }
+
+    private static LinkedList<Integer> extractNum(LinkedList<StringBuilder> list) {
+        LinkedList<Integer> nums = new LinkedList<>();
+        for(StringBuilder s : list) {
+            nums.add(Character.getNumericValue(s.charAt(0)));
+            s.deleteCharAt(0);
+        }
+        return nums;
     }
 
     private static int[][] getTiles(String board) {

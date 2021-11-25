@@ -55,11 +55,13 @@ public class Solver {
             //System.out.println("gen: " + i++);
             System.out.println("que size: " + que.size());
 
+            //if(i >= 10) break;
+
             node = que.poll();
 
             LinkedList<Node> sons = node.getSons();
 
-            System.out.println("Ded: " + node.getBoard().toString());
+            //System.out.println("Ded: " + node.getBoard().toString());
             //System.out.println("sons: ");
 
             for(Node s : sons) {
