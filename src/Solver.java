@@ -37,7 +37,7 @@ public class Solver {
         setEndBoard();
 
         boolean endFound = false;
-        HashMap<Node, Integer> nodeMap = new HashMap<>();
+        HashMap<Board, Integer> nodeMap = new HashMap<>();
 
         //Create the first node with zero moves
         Node node = new Node(getTiles(boardInputString), null, 0); 
@@ -47,7 +47,7 @@ public class Solver {
 
         PriorityQueue<Node> que = new PriorityQueue<>();;
         que.add(node);;
-        nodeMap.put(node, node.getMoves());
+        nodeMap.put(node.getBoard(), node.getMoves());
 
         int i = 0;
         while(!endFound) {
@@ -67,14 +67,17 @@ public class Solver {
 
                 //System.out.println(s.getBoard().toString());
                 Object tmp;
-                if((tmp = nodeMap.get(s)) != null) {
-
+                if((tmp = nodeMap.get(s.getBoard())) != null) {
+                    System.out.println("Sooos");
                     if((int)tmp > s.getMoves()) {
-                        nodeMap.put(s, s.getMoves());
+                        nodeMap.remove(s.getBoard());
+                        nodeMap.put(s.getBoard(), s.getMoves());
+                        que.remove(s);
+                        que.add(s);
                     }
 
                 } else {
-                    nodeMap.add(s);
+                    nodeMap.put(s.getBoard(), s.getMoves());
                     que.add(s); 
                 }
                 
@@ -98,8 +101,6 @@ public class Solver {
         while(!strBoards.isEmpty()) {
             System.out.println(strBoards.removeLast());
         }
-
-        
     }
 
     private static void setEndBoard() {

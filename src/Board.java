@@ -30,6 +30,10 @@ public class Board {
         return prevMoved;
     }
 
+    public short[][] getTiles() {
+        return tiles;
+    }
+
     public String toString() {
         StringBuilder s = new StringBuilder();
         for(int i = 0; i < Solver.boardSize; i++) {
@@ -53,34 +57,6 @@ public class Board {
         
         return sum;
     }
-
-    /*
-    public LinkedList<StringBuilder> getMoves() {
-        LinkedList<StringBuilder> sons = new LinkedList<>();
-        
-        if(!(zeroPos[0] - 1 < 0) && tiles[zeroPos[0] - 1][zeroPos[1]] != prevMoved) {
-           sons.add(getNewBoard(tiles[zeroPos[0] - 1][zeroPos[1]]));
-        }
-
-        if(!(zeroPos[0] + 1 >= Solver.boardSize) && tiles[zeroPos[0] + 1][zeroPos[1]] != prevMoved) {
-           sons.add(getNewBoard(tiles[zeroPos[0] + 1][zeroPos[1]]));
-        }
-
-        if(!(zeroPos[1] - 1 < 0) && tiles[zeroPos[0]][zeroPos[1] - 1] != prevMoved) {
-           sons.add(getNewBoard(tiles[zeroPos[0]][zeroPos[1] - 1]));
-        }
-
-        if(!(zeroPos[1] + 1 >= Solver.boardSize) && tiles[zeroPos[0]][zeroPos[1] + 1] != prevMoved) {
-           sons.add(getNewBoard(tiles[zeroPos[0]][zeroPos[1] + 1]));
-        }
-
-        return sons;
-    }
-    */
-
-    // Devo creare i figlio e cazzo per crearli devo stare attento a non creare un figlio che muove la stessa pedina di quello precedente
-    // In questo metodo devo tornare i figli, quindi le matrici con i figli ma come cazzo faccio e tornare ANCHE la cella che ho spostato?
-    // potrei passare una linked list di array di oggetti
 
     public LinkedList<Object[]> getMoves() {
         LinkedList<Object[]> sons = new LinkedList<>();
@@ -134,24 +110,6 @@ public class Board {
         return Solver.boardSize;
     }
 
-    // This function return the new String with the swapped values
-    private StringBuilder getNewBoard(int v) {
-        StringBuilder s = new StringBuilder();
-        s.append(v);
-        for(int i = 0; i < Solver.boardSize; i++) {
-            for(int j = 0; j < Solver.boardSize; j++) {
-                if(tiles[i][j] == 0)
-                    s.append(v);
-                else if(tiles[i][j] == v)
-                    s.append(0);
-                else
-                    s.append(tiles[i][j]);
-                s.append(" ");
-            }
-        }
-        return s;
-    }
-
     private short[][] getNewMatrixBoard(short v) {
         short[][] t = new short[Solver.boardSize][Solver.boardSize];
         for(int i = 0; i < Solver.boardSize; i++) {
@@ -182,4 +140,16 @@ public class Board {
         return null;
     }
 
+    @Override
+    public boolean equals(Object o) {
+
+        for(int i = 0; i < Solver.boardSize; i++) {
+            for(int j = 0; j < Solver.boardSize; j++) {
+                if(this.getTiles()[i][j] != ((Board)o).getTiles()[i][j])
+                    return false;
+            }
+        }   
+
+        return true;
+    }
 }

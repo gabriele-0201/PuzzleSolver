@@ -60,7 +60,9 @@ public class Node implements Comparable<Node>{
 
         return sons;
     }
-
-
     
+    @Override
+    public boolean equals(Object o) { 
+        return this.getBoard().equals(o);
+    }
 }
