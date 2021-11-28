@@ -11,13 +11,11 @@ public class Board {
         this.tiles = tiles;
         zeroPos = findZero();
 
-        /*
         for(int i = 0; i < tiles.length; i++){
             for(int j = 0; j < tiles[i].length; j++)
                 System.out.print(tiles[i][j] + " ");
             System.out.println("");
         }
-        */
     }
 
     public void setPrevMoved(short m) {
@@ -44,15 +42,12 @@ public class Board {
     }
 
     public int manhattan() {
-
         int sum = 0;
-
         for(int i = 0; i < Solver.boardSize; i++) {
             for(int j = 0; j < Solver.boardSize; j++) {
                sum += Math.abs((((j + 1) * (i + 1)) - tiles[i][j])); 
             }
         }
-        
         return sum;
     }
 
@@ -102,10 +97,6 @@ public class Board {
         }
 
         return sons;
-    }
-
-    public int getSize() {
-        return Solver.boardSize;
     }
 
     private short[][] getNewMatrixBoard(short v) {

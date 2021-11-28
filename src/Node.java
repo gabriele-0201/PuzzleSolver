@@ -42,6 +42,13 @@ public class Node implements Comparable<Node>{
         return v1 - v2;
     }
 
+    @Override
+    public boolean equals(Object o) { 
+        int v1 = this.score;
+        int v2 = ((Node)o).score;
+        return v1 == v2;
+    }
+
     public LinkedList<Node> getSons() {
         LinkedList<Node> sons = new LinkedList<>();
 
@@ -62,10 +69,5 @@ public class Node implements Comparable<Node>{
         }
 
         return sons;
-    }
-    
-    @Override
-    public boolean equals(Object o) { 
-        return this.board.equals(((Node)o).getBoard());
     }
 }

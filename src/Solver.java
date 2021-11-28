@@ -2,7 +2,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
@@ -43,46 +42,29 @@ public class Solver {
         Node node = new Node(getTiles(boardInputString), null, 0); 
         
         endFound = node.checkEnd();;
-        //endFound = true;;
 
         PriorityQueue<Node> que = new PriorityQueue<>();;
         que.add(node);;
         nodeMap.put(node.getBoard(), node);
 
-        int i = 0;
         while(!endFound) {
-            //System.out.println("gen: " + i++);
-            //System.out.println("que size: " + que.size());
-
-            //if(i >= 10) break;
 
             node = que.poll();
 
             LinkedList<Node> sons = node.getSons();
 
-            //System.out.println("Ded: " + node.getBoard().toString());
-            //System.out.println("sons: ");
-
             for(Node s : sons) {
 
-                //System.out.println(s.getBoard().toString());
                 Object tmp;
                 if((tmp = nodeMap.get(s.getBoard())) != null) {
-                    //System.out.println("CONFLITTO");
-                    if(((Node)tmp).getMoves() > s.getMoves()) {
-                        //nodeMap.remove(s.getBoard());
 
-                        //((Node)tmp).setMoves(s.getMoves());
+                    //System.out.println("CONFLITTO");
+
+                    if(((Node)tmp).getMoves() > s.getMoves()) {
 
                         que.remove((Node)tmp);
                         que.add(s);
 
-                        //nodeMap.put(s.getBoard(), s);
-                        //tmp.setMoves();
-
-                        //que.remove(s);
-
-                        //que.add(s);
                     }
 
                 } else {
