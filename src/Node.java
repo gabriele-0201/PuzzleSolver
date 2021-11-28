@@ -1,6 +1,5 @@
 import java.util.LinkedList;
 
-
 public class Node implements Comparable<Node>{
 
     private Node previous;
@@ -22,6 +21,10 @@ public class Node implements Comparable<Node>{
 
     public int getMoves() {
         return moves;
+    }
+
+    public void setMoves(int m) {
+        this.moves = m;
     }
 
     public Board getBoard()  {
@@ -63,6 +66,6 @@ public class Node implements Comparable<Node>{
     
     @Override
     public boolean equals(Object o) { 
-        return this.getBoard().equals(o);
+        return this.board.equals(((Node)o).getBoard());
     }
 }

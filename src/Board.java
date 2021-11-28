@@ -1,7 +1,5 @@
 import java.util.LinkedList;
 
-import javax.naming.ldap.LdapName;
-
 public class Board {
 
     private short[][] tiles;
@@ -151,5 +149,10 @@ public class Board {
         }   
 
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
     }
 }
