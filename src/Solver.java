@@ -36,6 +36,7 @@ public class Solver {
         setEndBoard();
 
         boolean endFound = false;
+
         HashMap<Board, Node> nodeMap = new HashMap<>();
 
         //Create the first node with zero moves
@@ -46,14 +47,18 @@ public class Solver {
         PriorityQueue<Node> que = new PriorityQueue<>();;
         que.add(node);;
         nodeMap.put(node.getBoard(), node);
+        
+        int i = 0;
 
         while(!endFound) {
-
+            
             node = que.poll();
 
             LinkedList<Node> sons = node.getSons();
 
             for(Node s : sons) {
+
+                //System.out.print(i++ + "\r");
 
                 Object tmp;
                 if((tmp = nodeMap.get(s.getBoard())) != null) {
@@ -82,6 +87,8 @@ public class Solver {
                 } 
             }
         }
+        
+        System.out.println();
 
         System.out.println(node.getMoves());
 

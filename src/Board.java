@@ -11,13 +11,6 @@ public class Board {
         this.tiles = tiles;
         zeroPos = findZero();
         
-        /*
-        for(int i = 0; i < tiles.length; i++){
-            for(int j = 0; j < tiles[i].length; j++)
-                System.out.print(tiles[i][j] + " ");
-            System.out.println("");
-        }
-        */
     }
 
     public void setPrevMoved(short m) {
@@ -47,7 +40,17 @@ public class Board {
         int sum = 0;
         for(int i = 0; i < Solver.boardSize; i++) {
             for(int j = 0; j < Solver.boardSize; j++) {
-               sum += Math.abs((((j + 1) * (i + 1)) - tiles[i][j])); 
+
+                int num;
+                if(tiles[i][j] == 0)
+                    continue;
+                else
+                    num = tiles[i][j];
+
+                int linePos = (num - 1) / Solver.boardSize;
+                int columnPos = (num - (linePos * Solver.boardSize)) - 1;
+
+                sum += Math.abs(linePos - i) + Math.abs(columnPos - j); 
             }
         }
         return sum;
