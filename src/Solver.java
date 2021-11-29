@@ -58,11 +58,14 @@ public class Solver {
                 Object tmp;
                 if((tmp = nodeMap.get(s.getBoard())) != null) {
 
-                    //System.out.println("CONFLITTO");
+                    //System.out.println("CONFLITTO " + ((Node)tmp).getBoard().toString() + " " + s.getBoard().toString());
 
                     if(((Node)tmp).getMoves() > s.getMoves()) {
 
-                        que.remove((Node)tmp);
+                        nodeMap.put(s.getBoard(), s);
+
+                        //test if without removing the element from the queue is more efficent
+                        //que.remove((Node)tmp);
                         que.add(s);
 
                     }

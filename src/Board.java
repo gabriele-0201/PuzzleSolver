@@ -10,12 +10,14 @@ public class Board {
 
         this.tiles = tiles;
         zeroPos = findZero();
-
+        
+        /*
         for(int i = 0; i < tiles.length; i++){
             for(int j = 0; j < tiles[i].length; j++)
                 System.out.print(tiles[i][j] + " ");
             System.out.println("");
         }
+        */
     }
 
     public void setPrevMoved(short m) {
