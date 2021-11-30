@@ -136,13 +136,14 @@ public class Board {
 
     @Override
     public boolean equals(Object o) {
-
         for(int i = 0; i < Solver.boardSize; i++) {
             for(int j = 0; j < Solver.boardSize; j++) {
                 if(this.getTiles()[i][j] != ((Board)o).getTiles()[i][j])
                     return false;
             }
-        }   
+        }
+
+        //return toString().hashCode() == ((Board)o).toString().hashCode();
 
         return true;
     }
