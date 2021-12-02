@@ -2,6 +2,7 @@ import java.util.LinkedList;
 
 public class Board {
 
+    //La matrice potrei eliminarla una volta avuto i figli
     private short[][] tiles;
     private short[] zeroPos;
     private short prevMoved;
