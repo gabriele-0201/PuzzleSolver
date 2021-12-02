@@ -58,18 +58,13 @@ public class Solver {
 
             for(Node s : sons) {
 
-                //System.out.print(i++ + "\r");
-
                 Object tmp;
                 if((tmp = nodeMap.get(s.getBoard())) != null) {
-
-                    //System.out.println("CONFLITTO " + ((Node)tmp).getBoard().toString() + " " + s.getBoard().toString());
 
                     if(((Node)tmp).getMoves() > s.getMoves()) {
 
                         nodeMap.put(s.getBoard(), s);
 
-                        //test if without removing the element from the queue is more efficent
                         //que.remove((Node)tmp);
                         que.add(s);
 
@@ -116,19 +111,4 @@ public class Solver {
         endBoard = s.toString();
     }
 
-    private static short[][] getTiles(String board) {
-        String[] chars = board.split(" ");
-        short[][] tiles = new short[Solver.boardSize][Solver.boardSize];
-        int i = 0;
-        int j = 0;
-        for(String c : chars) {
-            tiles[i][j++] = Short.parseShort(c);
-
-            if(j >= Solver.boardSize) {
-                i++;
-                j = 0;
-            }
-        }
-        return tiles;
-    }
 }

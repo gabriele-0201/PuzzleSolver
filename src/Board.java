@@ -3,29 +3,37 @@ import java.util.LinkedList;
 public class Board {
 
     //La matrice potrei eliminarla una volta avuto i figli
-    private short[][] tiles;
-    private short[] zeroPos;
-    private short prevMoved;
+    private int[][] tiles;
+    private StringBuilder bTiles;
+    private int zeroPos;
+    private int prevMoved;
+    private int manDist;
 
-    public Board(short[][] tiles) {
-
+    public Board(int[][] tiles) {
         this.tiles = tiles;
         zeroPos = findZero();
-        
     }
 
-    public void setPrevMoved(short m) {
-        prevMoved = m;
+    private Board(StringBuilder s, int[] zPos, int prevMov, int prevManhattan) {
+        tiles = null;
+        this.bTiles = s;
+        zeroPos = zPos();
+        prevMoved = prevMov;            
+
+        manDist = prevManhattan;
     }
 
     public short getPrevMoved() {
         return prevMoved;
     }
-
+    
+    /*
     public short[][] getTiles() {
         return tiles;
     }
-
+    */
+    
+    /*
     public String toString() {
         StringBuilder s = new StringBuilder();
         for(int i = 0; i < Solver.boardSize; i++) {
@@ -36,8 +44,12 @@ public class Board {
         }
         return s.toString();
     }
+    */
 
     public int manhattan() {
+        if(tiles == null)
+            return null;
+
         int sum = 0;
         for(int i = 0; i < Solver.boardSize; i++) {
             for(int j = 0; j < Solver.boardSize; j++) {
@@ -57,7 +69,77 @@ public class Board {
         return sum;
     }
 
+    //Have to decide if return direct the right array af Object with all the information
+    //Or return only the string builder
+    //
+    //OBVIOUSLY is better the first idea
+    private StringBuilder skipLine(char dir) {
+        StringBuilder son = new StringBuilder(bTiles);
+        int counter = 0; 
+        int index = zeroPos;
+        //index used for the replace, other side of the index
+        int otherIndex;
+        int moved;
+        boolean done = false;
+
+        switch(dir) {
+            case 'u': //up
+                index --; 
+
+                while(index >= 0 || counter < Solver.boardSize) {
+                    if(bTiles.charAt(index) == ' ') {
+                        otherIndex = index;
+                        counter++; 
+                    }
+                    index--; 
+                }
+
+                if(counter == Solver.boardSize) {
+                    String strMoved = Integer.parseInt(son.substring(index, otherIndex));
+                    moved = (int)strMoved;
+                    son.replace(index, otherIndex, intMovement);
+                    son.replace(zeroPos, zeroPos, strMoved);
+                    done = true;
+                }
+
+                break;
+
+            case 'd': //down
+                
+                index ++;
+
+                while(index <= bTiles.length() || counter < Solver.boardSize) {
+                    if(bTiles.charAt(index) == ' ') {
+                        otherIndex = index;
+                        counter++; 
+                    }
+                    index++; 
+                }
+
+                if(counter == Solver.boardSize) {
+                    String strMoved = Integer.parseInt(son.substring(index, otherIndex));
+                    moved = (int)strMoved;
+                    son.replace(otherIndex, index, intMovement);
+                    son.replace(zeroPos, zeroPos, strMoved);
+                    done = true;
+                }
+
+                break;
+        }
+
+
+
+    }
+
     public LinkedList<Object[]> getMoves() {
+
+        LinkedList<Object[]> sons = new LinkedList<>();
+        Object[] son;
+
+        
+        
+
+        /*
         LinkedList<Object[]> sons = new LinkedList<>();
         
         if(!(zeroPos[0] - 1 < 0) && tiles[zeroPos[0] - 1][zeroPos[1]] != prevMoved) {
@@ -103,9 +185,11 @@ public class Board {
         }
 
         return sons;
+        */
     }
 
-    private short[][] getNewMatrixBoard(short v) {
+    private StringBuilder getNewStr(short v) {
+
         short[][] t = new short[Solver.boardSize][Solver.boardSize];
         for(int i = 0; i < Solver.boardSize; i++) {
             for(int j = 0; j < Solver.boardSize; j++) {
@@ -120,6 +204,7 @@ public class Board {
             }
         }
         return t;
+
     }
 
     private short[] findZero() {

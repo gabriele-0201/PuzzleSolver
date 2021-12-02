@@ -7,9 +7,15 @@ public class Node implements Comparable<Node>{
     private int moves;
     private int score;
 
-    public Node(short[][] board, Node previous, int moves) {
+    public Node(String strBoard, Node previous, int moves) {
+        this.board = new Board(getTiles(strBoard));
+        this.previous = previous;
+        this.moves = moves;
+        score = this.board.manhattan() + this.moves;
+    }
 
-        this.board = new Board(board);
+    public Node(StringBuilder strBoard, Node previous, int moves,  ) {
+        this.board = new Board(strBoard,  );
         this.previous = previous;
         this.moves = moves;
         score = this.board.manhattan() + this.moves;
@@ -52,12 +58,22 @@ public class Node implements Comparable<Node>{
     public LinkedList<Node> getSons() {
         LinkedList<Node> sons = new LinkedList<>();
 
+        //This is all I receive from the board
         LinkedList<Object[]> vals = board.getMoves();
-        LinkedList<short[][]> moves = new LinkedList<>();
-        LinkedList<Short> prevMoves = new LinkedList<>();
+
+        //here I will store all the stuf separatede, MAYBE USEFEULL
+        LinkedList<int[][]> moves = new LinkedList<>();
+        LinkedList<Integer> prevMoves = new LinkedList<>();
+
+
+        // work with all sons 
+        // 1 place : str of son
+        // 2 palce : int of the previuos moved number
+        // 3 place : new zero position of the son
+        // 4 palce : new manhattan
+        
         for(Object[] o : vals) {
-            prevMoves.add((short)o[0]);
-            moves.add((short[][])o[1]);
+        
         }
 
         int sonsMoves = this.moves + 1;
@@ -69,5 +85,21 @@ public class Node implements Comparable<Node>{
         }
 
         return sons;
+    }
+
+    private static short[][] getTiles(String board) {
+        String[] chars = board.split(" ");
+        short[][] tiles = new short[Solver.boardSize][Solver.boardSize];
+        int i = 0;
+        int j = 0;
+        for(String c : chars) {
+            tiles[i][j++] = Short.parseShort(c);
+
+            if(j >= Solver.boardSize) {
+                i++;
+                j = 0;
+            }
+        }
+        return tiles;
     }
 }
