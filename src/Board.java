@@ -55,26 +55,35 @@ public class Board {
             for(int j = 0; j < Solver.boardSize; j++) {
 
                 int num;
-                if(tiles[i][j] == 0)
+                if(tiles[i][j] == 0) // count nothing if is zero
                     continue;
                 else
                     num = tiles[i][j];
 
-                int linePos = (num - 1) / Solver.boardSize;
-                int columnPos = (num - (linePos * Solver.boardSize)) - 1;
+                int[] rightPos = getRightPos(num);
 
-                sum += Math.abs(linePos - i) + Math.abs(columnPos - j); 
+                sum += Math.abs(rightPos[0] - i) + Math.abs(rightPos[1] - j); 
             }
         }
         return sum;
     }
 
-    //Have to decide if return direct the right array af Object with all the information
+    private int[] getRightPos(int v) {
+        int[] rightPos = new int[2];
+        rightPos[0]= (v - 1) / Solver.boardSize;
+        rightPos[1] = (v - (rightPos[0] * Solver.boardSize)) - 1;
+        return rightPos;
+    }
+
+    // --> Have to decide if return direct the right array af Object with all the information
     //Or return only the string builder
     //
     //OBVIOUSLY is better the first idea
-    private StringBuilder skipLine(char dir) {
-        StringBuilder son = new StringBuilder(bTiles);
+    private Object[] makeMove(char dir) {
+        Object[] son = null;
+         
+        StringBuilder strSon = new StringBuilder(bTiles);
+
         int counter = 0; 
         int index = zeroPos;
         //index used for the replace, other side of the index
@@ -85,7 +94,8 @@ public class Board {
         switch(dir) {
             case 'u': //up
                 index --; 
-
+               
+                // go until find the right value to replace
                 while(index >= 0 || counter < Solver.boardSize) {
                     if(bTiles.charAt(index) == ' ') {
                         otherIndex = index;
@@ -93,12 +103,13 @@ public class Board {
                     }
                     index--; 
                 }
-
+                
+                // replace the value and store the moved char
                 if(counter == Solver.boardSize) {
-                    String strMoved = Integer.parseInt(son.substring(index, otherIndex));
+                    String strMoved = Integer.parseInt(strSon.substring(index, otherIndex));
                     moved = (int)strMoved;
-                    son.replace(index, otherIndex, intMovement);
-                    son.replace(zeroPos, zeroPos, strMoved);
+                    strSon.replace(index, otherIndex, intMovement);
+                    strSon.replace(zeroPos, zeroPos, strMoved);
                     done = true;
                 }
 
@@ -117,18 +128,60 @@ public class Board {
                 }
 
                 if(counter == Solver.boardSize) {
-                    String strMoved = Integer.parseInt(son.substring(index, otherIndex));
+                    String strMoved = Integer.parseInt(strSon.substring(index, otherIndex));
                     moved = (int)strMoved;
-                    son.replace(otherIndex, index, intMovement);
-                    son.replace(zeroPos, zeroPos, strMoved);
+                    strSon.replace(otherIndex, index, intMovement);
+                    strSon.replace(zeroPos, zeroPos, strMoved);
                     done = true;
                 }
 
                 break;
+
+            case 'r':
+
+                break;
+
+            case 'l':
+
+                break;
         }
 
+        if(done) {
+            son = new Object[4];
+            son[0] = strSon;
+            son[1] = moved;
+            
+            int[] newPos;
 
+            if(dir == 'u') {
+                son[2] = zeroPos - Solver.boardSize;
+                newPos = getRightPos(zeroPos - Solver.boardSize)
+            }
+            else if(dir == 'd') {
+                son[2] = zeroPos + Solver.boardSize;
+                newPos = getRightPos(zeroPos + Solver.boardSize)
+            }
 
+            // How Can I calculate the new Manhattan?
+            // Now the number moved is in the ZERO POSITION
+            // So I can calculate the manhattan like the zero is the moved number
+            // and see if it is increased or decreased
+            
+            int[] oldPos = getRightPos[zeroPos];
+            int[] rightPos = getRightPos[moved];
+            
+            if((oldPos[0] - rightPos[0]) < (newPos[0] - rightPos[0])) {
+               son[3] = manhattan + 1;
+            } else if((oldPos[1] - rightPos[1]) < (newPos[1] - rightPos[1])) {
+               son[3] = manhattan + 1;
+            } else {
+                son[3] = manhattan - 1;
+            }
+
+            return son;
+        }
+
+        return null;
     }
 
     public LinkedList<Object[]> getMoves() {
