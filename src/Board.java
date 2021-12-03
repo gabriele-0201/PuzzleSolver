@@ -11,44 +11,34 @@ public class Board {
 
     public Board(int[][] tiles) {
         this.tiles = tiles;
+        toStrBuilder();
         zeroPos = findZero();
+        manDist = manhattan();
     }
 
-    private Board(StringBuilder s, int[] zPos, int prevMov, int prevManhattan) {
+    private Board(StringBuilder s, int zPos, int moved, int manhattan) {
         tiles = null;
         this.bTiles = s;
-        zeroPos = zPos();
-        prevMoved = prevMov;            
-
-        manDist = prevManhattan;
+        zeroPos = zPos;
+        prevMoved = moved;            
+        manDist = manhattan;
     }
 
-    public short getPrevMoved() {
+    public int getPrevMoved() {
         return prevMoved;
     }
     
-    /*
-    public short[][] getTiles() {
-        return tiles;
+    public int getManDist() {
+        return manDist;
     }
-    */
-    
-    /*
-    public String toString() {
-        StringBuilder s = new StringBuilder();
-        for(int i = 0; i < Solver.boardSize; i++) {
-            for(int j = 0; j < Solver.boardSize; j++) {
-               s.append(tiles[i][j]);
-               s.append(" ");
-            }
-        }
-        return s.toString();
+
+    public StringBuilder getStrBuilder() {
+        return bTiles;
     }
-    */
 
     public int manhattan() {
         if(tiles == null)
-            return null;
+            return -1;
 
         int sum = 0;
         for(int i = 0; i < Solver.boardSize; i++) {
@@ -79,7 +69,9 @@ public class Board {
     //Or return only the string builder
     //
     //OBVIOUSLY is better the first idea
-    private Object[] makeMove(char dir) {
+    //
+    //dir: 1 - up, 2 - right, 3 - down, 4 - left
+    private Object[] makeMove(int dir) {
         Object[] son = null;
          
         StringBuilder strSon = new StringBuilder(bTiles);
@@ -87,12 +79,12 @@ public class Board {
         int counter = 0; 
         int index = zeroPos;
         //index used for the replace, other side of the index
-        int otherIndex;
-        int moved;
+        int otherIndex = -1;
+        int moved = -1;
         boolean done = false;
 
         switch(dir) {
-            case 'u': //up
+            case 1: //up
                 index --; 
                
                 // go until find the right value to replace
@@ -105,17 +97,14 @@ public class Board {
                 }
                 
                 // replace the value and store the moved char
-                if(counter == Solver.boardSize) {
-                    String strMoved = Integer.parseInt(strSon.substring(index, otherIndex));
-                    moved = (int)strMoved;
-                    strSon.replace(index, otherIndex, intMovement);
-                    strSon.replace(zeroPos, zeroPos, strMoved);
+                if(counter == Solver.boardSize) 
                     done = true;
-                }
+                else 
+                    return null;
 
                 break;
 
-            case 'd': //down
+            case 3: //down
                 
                 index ++;
 
@@ -127,39 +116,98 @@ public class Board {
                     index++; 
                 }
 
-                if(counter == Solver.boardSize) {
-                    String strMoved = Integer.parseInt(strSon.substring(index, otherIndex));
-                    moved = (int)strMoved;
-                    strSon.replace(otherIndex, index, intMovement);
-                    strSon.replace(zeroPos, zeroPos, strMoved);
+                if(counter == Solver.boardSize) 
                     done = true;
-                }
+                else 
+                    return null;
 
                 break;
 
-            case 'r':
+            case 2: //right
+                
+                index++;
+
+                if(index >= bTiles.length())
+                    return null;
+               
+                otherIndex = index;
+                while(bTiles.charAt(index) != ' ')
+                    index++;
+                index--;
+
+                done = true;
 
                 break;
 
-            case 'l':
+            case 4: //left
+
+                index--;
+
+                if(index < 0)
+                    return null;
+               
+                otherIndex = index;
+                while(bTiles.charAt(index) != ' ')
+                    index--;
+                index++;
+
+                done = true;
 
                 break;
         }
 
         if(done) {
+
+            String strMoved;
+
+            switch (dir) {
+                case 1:
+                case 4:
+
+                    strMoved = strSon.substring(index, otherIndex);
+                    moved = Integer.parseInt(strMoved);
+
+                    if (prevMoved == moved)
+                        return null;
+
+                    strSon.replace(index, otherIndex, "0");
+                    strSon.replace(zeroPos, zeroPos, strMoved);
+
+                    break;
+                case 3:
+                case 2:
+
+                    strMoved = strSon.substring(otherIndex, index);
+                    moved = Integer.parseInt(strMoved);
+                    
+                    if (prevMoved == moved)
+                        return null;
+
+                    strSon.replace(otherIndex, index, "0");
+                    strSon.replace(zeroPos, zeroPos, strMoved);
+
+                    break;
+            }
+
             son = new Object[4];
             son[0] = strSon;
             son[1] = moved;
             
-            int[] newPos;
-
-            if(dir == 'u') {
-                son[2] = zeroPos - Solver.boardSize;
-                newPos = getRightPos(zeroPos - Solver.boardSize)
-            }
-            else if(dir == 'd') {
-                son[2] = zeroPos + Solver.boardSize;
-                newPos = getRightPos(zeroPos + Solver.boardSize)
+            int[] newPos = null;
+            
+            switch (dir) {
+                case 1:
+                    son[2] = zeroPos - Solver.boardSize;
+                    newPos = getRightPos(zeroPos - Solver.boardSize);
+                    break; 
+                case 2:
+                    son[2] = zeroPos + 1;
+                    newPos = getRightPos(zeroPos + 1);
+                    break; 
+                case 3:
+                    son[2] = zeroPos + Solver.boardSize;
+                    newPos = getRightPos(zeroPos + Solver.boardSize);
+                    break; 
             }
 
             // How Can I calculate the new Manhattan?
@@ -167,15 +215,15 @@ public class Board {
             // So I can calculate the manhattan like the zero is the moved number
             // and see if it is increased or decreased
             
-            int[] oldPos = getRightPos[zeroPos];
-            int[] rightPos = getRightPos[moved];
+            int[] oldPos = getRightPos(zeroPos);
+            int[] rightPos = getRightPos(moved);
             
             if((oldPos[0] - rightPos[0]) < (newPos[0] - rightPos[0])) {
-               son[3] = manhattan + 1;
+               son[3] = manDist + 1;
             } else if((oldPos[1] - rightPos[1]) < (newPos[1] - rightPos[1])) {
-               son[3] = manhattan + 1;
+               son[3] = manDist + 1;
             } else {
-                son[3] = manhattan - 1;
+                son[3] = manDist - 1;
             }
 
             return son;
@@ -184,107 +232,57 @@ public class Board {
         return null;
     }
 
-    public LinkedList<Object[]> getMoves() {
+        // work with all sons 
+        // 1 place : str of son
+        // 2 palce : int of the previuos moved number
+        // 3 place : new zero position of the son
+        // 4 palce : new manhattan
+   
 
-        LinkedList<Object[]> sons = new LinkedList<>();
+    public LinkedList<Board> getMoves() {
+
+        LinkedList<Board> sons = new LinkedList<>();
         Object[] son;
 
-        
-        
-
-        /*
-        LinkedList<Object[]> sons = new LinkedList<>();
-        
-        if(!(zeroPos[0] - 1 < 0) && tiles[zeroPos[0] - 1][zeroPos[1]] != prevMoved) {
-            Object[] son = new Object[2];
-            short v = tiles[zeroPos[0] - 1][zeroPos[1]];
-
-            son[0] = v;
-            son[1] = getNewMatrixBoard(v);
-            
-            sons.add(son);
+        for(int i = 1; i <= 4; i++) {
+            Object[] newSon = makeMove(i);
+            if(newSon != null)
+                sons.add( new Board((StringBuilder)newSon[0], (int)newSon[2], (int)newSon[1], (int)newSon[3]) );
         }
 
-        if(!(zeroPos[0] + 1 >= Solver.boardSize) && tiles[zeroPos[0] + 1][zeroPos[1]] != prevMoved) {
-            Object[] son = new Object[2];
-            short v = tiles[zeroPos[0] + 1][zeroPos[1]];
-
-            son[0] = v;
-            son[1] = getNewMatrixBoard(v);
-            
-            sons.add(son);
-        }
-
-        if(!(zeroPos[1] - 1 < 0) && tiles[zeroPos[0]][zeroPos[1] - 1] != prevMoved) {
-
-            Object[] son = new Object[2];
-            short v = tiles[zeroPos[0]][zeroPos[1] - 1];
-
-            son[0] = v;
-            son[1] = getNewMatrixBoard(v);
-            
-            sons.add(son);
-        }
-
-        if(!(zeroPos[1] + 1 >= Solver.boardSize) && tiles[zeroPos[0]][zeroPos[1] + 1] != prevMoved) {
-
-            Object[] son = new Object[2];
-            short v = tiles[zeroPos[0]][zeroPos[1] + 1];
-
-            son[0] = v;
-            son[1] = getNewMatrixBoard(v);
-            
-            sons.add(son);
-        }
-
-        return sons;
-        */
+        return sons; 
     }
 
-    private StringBuilder getNewStr(short v) {
+    private void toStrBuilder() {
+        bTiles = new StringBuilder();
 
-        short[][] t = new short[Solver.boardSize][Solver.boardSize];
         for(int i = 0; i < Solver.boardSize; i++) {
             for(int j = 0; j < Solver.boardSize; j++) {
-                if(tiles[i][j] == 0) { 
-                    t[i][j] = v;
-                }
-                else if(tiles[i][j] == v) {
-                    t[i][j] = 0;
-                } else {
-                    t[i][j] = tiles[i][j];
-                }
+                bTiles.append(tiles[i][j] + " ");
             }
         }
-        return t;
 
+        bTiles.deleteCharAt(bTiles.length() - 1);
     }
 
-    private short[] findZero() {
-        for(short i = 0; i < Solver.boardSize; i++) {
-            for(short j = 0; j < Solver.boardSize; j++) {
-                if(tiles[i][j] == 0) {
-                    short[] arr = {i, j};
-                    return arr;
-                }
+    private int findZero() {
+        int counter = 0; 
+        for(int i = 0; i < bTiles.length(); i++) {
+
+            if(bTiles.charAt(i) == ' ')
+                counter++;
+            else if(bTiles.charAt(i) == '0') {
+                counter++;
+                return counter;    
             }
 
         }
-        return null;
+        return -1;
     }
 
     @Override
     public boolean equals(Object o) {
-        for(int i = 0; i < Solver.boardSize; i++) {
-            for(int j = 0; j < Solver.boardSize; j++) {
-                if(this.getTiles()[i][j] != ((Board)o).getTiles()[i][j])
-                    return false;
-            }
-        }
-
-        //return toString().hashCode() == ((Board)o).toString().hashCode();
-
-        return true;
+        return bTiles.equals((StringBuilder)o);
     }
 
     @Override

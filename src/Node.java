@@ -13,12 +13,15 @@ public class Node implements Comparable<Node>{
         this.moves = moves;
         score = this.board.manhattan() + this.moves;
     }
-
-    public Node(StringBuilder strBoard, Node previous, int moves,  ) {
-        this.board = new Board(strBoard,  );
+    
+    //this constructuor is only called from inside so it could be private
+    private Node(Board board, Node previous, int moves) {
+        this.board = board;
         this.previous = previous;
         this.moves = moves;
-        score = this.board.manhattan() + this.moves;
+        //have to change this
+        //score = this.board.manhattan() + this.moves;
+        score = this.board.getManDist() + this.moves;
     }
 
     public Node getPrevious() {
@@ -38,58 +41,38 @@ public class Node implements Comparable<Node>{
     }
 
     public boolean checkEnd() {
-        return Solver.endBoard.equals(this.board.toString());
+        return Solver.endBoard.equals(this.board.getStrBuilder());
     }
 
     @Override
     public int compareTo(Node o) {
-        int v1 = this.score;
-        int v2 = o.score;
-        return v1 - v2;
+        return this.score - o.score;
     }
 
     @Override
     public boolean equals(Object o) { 
-        int v1 = this.score;
-        int v2 = ((Node)o).score;
-        return v1 == v2;
+        return this.score == ((Node)o).score;
     }
 
+    //Maybe I could do that the board create already the board object son
+    //So the return of the get sons is already a list af board with all already done
+    
     public LinkedList<Node> getSons() {
         LinkedList<Node> sons = new LinkedList<>();
-
-        //This is all I receive from the board
-        LinkedList<Object[]> vals = board.getMoves();
-
-        //here I will store all the stuf separatede, MAYBE USEFEULL
-        LinkedList<int[][]> moves = new LinkedList<>();
-        LinkedList<Integer> prevMoves = new LinkedList<>();
-
-
-        // work with all sons 
-        // 1 place : str of son
-        // 2 palce : int of the previuos moved number
-        // 3 place : new zero position of the son
-        // 4 palce : new manhattan
-        
-        for(Object[] o : vals) {
-        
-        }
+        LinkedList<Board> moves = board.getMoves();
 
         int sonsMoves = this.moves + 1;
 
         for(int i = 0; i < moves.size(); i++) {
-            Node n = new Node(moves.get(i), this, sonsMoves);
-            n.getBoard().setPrevMoved(prevMoves.get(i));
-            sons.add(n);
+            sons.add(new Node(moves.get(i), this, sonsMoves));
         }
 
         return sons;
     }
 
-    private static short[][] getTiles(String board) {
+    private static int[][] getTiles(String board) {
         String[] chars = board.split(" ");
-        short[][] tiles = new short[Solver.boardSize][Solver.boardSize];
+        int[][] tiles = new int[Solver.boardSize][Solver.boardSize];
         int i = 0;
         int j = 0;
         for(String c : chars) {

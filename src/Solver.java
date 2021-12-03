@@ -7,7 +7,7 @@ import java.util.PriorityQueue;
 
 public class Solver {
 
-    public static String endBoard;
+    public static StringBuilder endBoard;
     public static int boardSize;
 
     public static void main(String[] args) {
@@ -40,7 +40,7 @@ public class Solver {
         HashMap<Board, Node> nodeMap = new HashMap<>();
 
         //Create the first node with zero moves
-        Node node = new Node(getTiles(boardInputString), null, 0); 
+        Node node = new Node(boardInputString, null, 0); 
         
         endFound = node.checkEnd();;
 
@@ -101,14 +101,13 @@ public class Solver {
 
     private static void setEndBoard() {
         int n = boardSize * boardSize;
-        StringBuilder s = new StringBuilder();
+        endBoard  = new StringBuilder();
         for(int i = 1; i < n; i++) {
-            s.append(i);
-            s.append(" ");
+            endBoard.append(i);
+            endBoard.append(" ");
         }
-        s.append("0");
-        s.append(" ");
-        endBoard = s.toString();
+        endBoard.append("0");
+        endBoard.append(" ");
     }
 
 }
