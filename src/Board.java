@@ -95,9 +95,10 @@ public class Board {
         int moved = -1;
         boolean done = false;
         
+        //System.out.println("Starting index: " + index);
+        //System.out.println("right index" + getRightIndex());
         switch(dir) {
             case 1: //up
-
                 counter = -1;
                 index--; 
                
@@ -107,8 +108,9 @@ public class Board {
 
                         counter++; 
 
-                        if (counter == Solver.boardSize - 1)
+                        if (counter == Solver.boardSize - 1){
                             otherIndex = index - 1;
+                        }
                         else if (counter >= Solver.boardSize) {
                             done = true;
                             index += 2;
@@ -118,7 +120,7 @@ public class Board {
                     index--; 
                 }
                 
-                if(counter == Solver.boardSize - 1) {
+                if(!done && counter == Solver.boardSize - 1) {
                     done = true;
                     index++;
                 } else if(!done) 
@@ -153,7 +155,7 @@ public class Board {
                 //TODO have to check if the while is finished BEFORE finding a new space
                 //so the done variable is not set to true
                 
-                if(counter == Solver.boardSize - 1) {
+                if(!done && counter == Solver.boardSize - 1) {
                     done = true;
                     index--;
                 } else if(!done) 
@@ -228,8 +230,8 @@ public class Board {
                     if (prevMoved == moved)
                         return null;
 
-                    strSon.replace(index, otherIndex + 1, "0");
                     strSon.replace(zeroIndex, zeroIndex + 1, strMoved);
+                    strSon.replace(index, otherIndex + 1, "0");
 
                     newZeroIndex = index;
 
@@ -248,7 +250,7 @@ public class Board {
                     strSon.replace(otherIndex, index + 1, "0");
                     strSon.replace(zeroIndex, zeroIndex + 1, strMoved);
 
-                    newZeroIndex = otherIndex;
+                    newZeroIndex = otherIndex + strMoved.length() - 1;
 
                     break;
             }
@@ -329,8 +331,7 @@ public class Board {
         for(int i = 1; i <= 4; i++) {
             Object[] newSon = makeMove(i);
             if(newSon != null) {
-                //System.out.println("figlio dir: " + i);
-                //System.out.println(((StringBuilder)newSon[0]).toString());
+                //System.out.println("figlio dir: " + i + " - " +  ((StringBuilder)newSon[0]).toString());
                 sons.add( new Board((StringBuilder)newSon[0], (int)newSon[2], (int)newSon[3], (int)newSon[1], (int)newSon[4]) );
             }
             //else 
@@ -359,11 +360,29 @@ public class Board {
             if(bTiles.charAt(i) == ' ')
                 counter++;
             else if(bTiles.charAt(i) == '0') {
-                //counter++;
-                zeroPos = counter;
-                zeroIndex = i;
+                if(i - 1 >=0 && bTiles.charAt(i - 1) == ' ') {
+                    if(i + 1 < bTiles.length() && bTiles.charAt(i + 1) == ' ') {
+                        zeroPos = counter;
+                        zeroIndex = i;
+                    }
+                }
             }
         }
+    }
+
+    private int getRightIndex() {
+        
+        for(int i = 0; i < bTiles.length(); i++) {
+
+            if(bTiles.charAt(i) == '0') {
+                if(i - 1 >=0 && bTiles.charAt(i - 1) == ' ') {
+                    if(i + 1 < bTiles.length() && bTiles.charAt(i + 1) == ' ') {
+                    }
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 
     @Override
