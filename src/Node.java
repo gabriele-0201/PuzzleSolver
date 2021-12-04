@@ -19,8 +19,6 @@ public class Node implements Comparable<Node>{
         this.board = board;
         this.previous = previous;
         this.moves = moves;
-        //have to change this
-        //score = this.board.manhattan() + this.moves;
         score = this.board.getManDist() + this.moves;
     }
 
@@ -41,7 +39,7 @@ public class Node implements Comparable<Node>{
     }
 
     public boolean checkEnd() {
-        return Solver.endBoard.equals(this.board.getStrBuilder());
+        return (Solver.endBoard).equals(this.board.toString());
     }
 
     @Override
@@ -63,8 +61,11 @@ public class Node implements Comparable<Node>{
 
         int sonsMoves = this.moves + 1;
 
+        //System.out.println("Dead: " + board + " manhattan: " + board.getManDist());
+
         for(int i = 0; i < moves.size(); i++) {
             sons.add(new Node(moves.get(i), this, sonsMoves));
+            //System.out.println("Son: " + moves.get(i) + " manhattan: " + moves.get(i).getManDist());
         }
 
         return sons;

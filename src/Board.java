@@ -1,4 +1,5 @@
 import java.util.LinkedList;
+import java.lang.Math;
 
 public class Board {
 
@@ -6,20 +7,25 @@ public class Board {
     private int[][] tiles;
     private StringBuilder bTiles;
     private int zeroPos;
+    private int zeroIndex;
     private int prevMoved;
     private int manDist;
 
     public Board(int[][] tiles) {
         this.tiles = tiles;
         toStrBuilder();
-        zeroPos = findZero();
+        findZero();
         manDist = manhattan();
     }
 
-    private Board(StringBuilder s, int zPos, int moved, int manhattan) {
+    private Board(StringBuilder s, int zPos, int zIndex, int moved, int manhattan) {
         tiles = null;
         this.bTiles = s;
         zeroPos = zPos;
+
+        //System.out.println("Zero pos: " + zeroPos);
+
+        zeroIndex = zIndex;
         prevMoved = moved;            
         manDist = manhattan;
     }
@@ -71,85 +77,135 @@ public class Board {
     //OBVIOUSLY is better the first idea
     //
     //dir: 1 - up, 2 - right, 3 - down, 4 - left
+    //
+    //
+    //ATTENZIONE DIFFERENZA TRA INDEXZERO E ZEROPOS
+    //
     private Object[] makeMove(int dir) {
+        //System.out.println("Direction: " + dir);
         Object[] son = null;
          
         StringBuilder strSon = new StringBuilder(bTiles);
 
         int counter = 0; 
-        int index = zeroPos;
+        int index = zeroIndex;
+        int newZeroIndex = -1;
         //index used for the replace, other side of the index
         int otherIndex = -1;
         int moved = -1;
         boolean done = false;
-
+        
         switch(dir) {
             case 1: //up
-                index --; 
+
+                counter = -1;
+                index--; 
                
                 // go until find the right value to replace
-                while(index >= 0 || counter < Solver.boardSize) {
-                    if(bTiles.charAt(index) == ' ') {
-                        otherIndex = index;
+                while(index >= 0 && !done) {
+                    if(bTiles.charAt(index) == ' ' ) {
+
                         counter++; 
+
+                        if (counter == Solver.boardSize - 1)
+                            otherIndex = index - 1;
+                        else if (counter >= Solver.boardSize) {
+                            done = true;
+                            index += 2;
+                        }
+
                     }
                     index--; 
                 }
                 
-                // replace the value and store the moved char
-                if(counter == Solver.boardSize) 
+                if(counter == Solver.boardSize - 1) {
                     done = true;
-                else 
+                    index++;
+                } else if(!done) 
                     return null;
+
+                //System.out.println(index + " " + otherIndex);
 
                 break;
 
             case 3: //down
-                
-                index ++;
 
-                while(index <= bTiles.length() || counter < Solver.boardSize) {
+                counter = -1;
+                index++; 
+               
+                // go until find the right value to replace
+                while(index < bTiles.length() && !done) {
                     if(bTiles.charAt(index) == ' ') {
-                        otherIndex = index;
+
                         counter++; 
+
+                        if (counter == Solver.boardSize - 1)
+                            otherIndex = index + 1;
+                        else if (counter >= Solver.boardSize) {
+                            done = true;
+                            index -= 2;
+                        }
+
                     }
                     index++; 
                 }
-
-                if(counter == Solver.boardSize) 
+                
+                //TODO have to check if the while is finished BEFORE finding a new space
+                //so the done variable is not set to true
+                
+                if(counter == Solver.boardSize - 1) {
                     done = true;
-                else 
+                    index--;
+                } else if(!done) 
                     return null;
+
+                //System.out.println(index + " " + otherIndex);
 
                 break;
 
             case 2: //right
-                
-                index++;
+                index+=2;
 
-                if(index >= bTiles.length())
+                if(index > bTiles.length())
                     return null;
-               
-                otherIndex = index;
-                while(bTiles.charAt(index) != ' ')
+
+                //Add the check to the line
+                // The right number have to be in the same position of the previous 
+                if((zeroPos - 1) / Solver.boardSize != (zeroPos) / Solver.boardSize )
+                    return null;
+                
+                //System.out.println("QUI SuPerA");
+
+                otherIndex = index; //save the start of the number
+
+                while(index < bTiles.length() && bTiles.charAt(index) != ' ')
                     index++;
                 index--;
 
                 done = true;
 
+                //System.out.println(index + " " + otherIndex);
+
                 break;
 
             case 4: //left
 
-                index--;
+                index-=2;
 
                 if(index < 0)
                     return null;
-               
+
+                //Add the check to the line
+                // The right number have to be in the same position of the previous 
+                if((zeroPos - 1) / Solver.boardSize != (zeroPos - 2) / Solver.boardSize )
+                    return null;
+
                 otherIndex = index;
-                while(bTiles.charAt(index) != ' ')
+                while(index >= 0 && bTiles.charAt(index) != ' ')
                     index--;
                 index++;
+
+                //System.out.println(index + " " + otherIndex);
 
                 done = true;
 
@@ -164,66 +220,90 @@ public class Board {
                 case 1:
                 case 4:
 
-                    strMoved = strSon.substring(index, otherIndex);
+                    strMoved = strSon.substring(index, otherIndex + 1);
                     moved = Integer.parseInt(strMoved);
+
+                    //System.out.println("Number to move: " + moved);
 
                     if (prevMoved == moved)
                         return null;
 
-                    strSon.replace(index, otherIndex, "0");
-                    strSon.replace(zeroPos, zeroPos, strMoved);
+                    strSon.replace(index, otherIndex + 1, "0");
+                    strSon.replace(zeroIndex, zeroIndex + 1, strMoved);
+
+                    newZeroIndex = index;
 
                     break;
                 case 3:
                 case 2:
 
-                    strMoved = strSon.substring(otherIndex, index);
+                    strMoved = strSon.substring(otherIndex, index + 1);
                     moved = Integer.parseInt(strMoved);
+
+                    //System.out.println("Number to move: " + moved);
                     
                     if (prevMoved == moved)
                         return null;
 
-                    strSon.replace(otherIndex, index, "0");
-                    strSon.replace(zeroPos, zeroPos, strMoved);
+                    strSon.replace(otherIndex, index + 1, "0");
+                    strSon.replace(zeroIndex, zeroIndex + 1, strMoved);
+
+                    newZeroIndex = otherIndex;
 
                     break;
             }
 
-            son = new Object[4];
+            son = new Object[5];
             son[0] = strSon;
             son[1] = moved;
             
-            int[] newPos = null;
+            int[] oldPos = null;
             
             switch (dir) {
                 case 1:
                     son[2] = zeroPos - Solver.boardSize;
-                    newPos = getRightPos(zeroPos - Solver.boardSize);
+                    oldPos = getRightPos(zeroPos - Solver.boardSize);
                     break; 
                 case 2:
                     son[2] = zeroPos + 1;
-                    newPos = getRightPos(zeroPos + 1);
+                    oldPos = getRightPos(zeroPos + 1);
                     break; 
                 case 3:
                     son[2] = zeroPos + Solver.boardSize;
-                    newPos = getRightPos(zeroPos + Solver.boardSize);
+                    oldPos = getRightPos(zeroPos + Solver.boardSize);
+                    break; 
+                case 4:
+                    son[2] = zeroPos - 1;
+                    oldPos = getRightPos(zeroPos - 1);
                     break; 
             }
+
+            son[3] = newZeroIndex;
 
             // How Can I calculate the new Manhattan?
             // Now the number moved is in the ZERO POSITION
             // So I can calculate the manhattan like the zero is the moved number
             // and see if it is increased or decreased
             
-            int[] oldPos = getRightPos(zeroPos);
+            int[] newPos = getRightPos(zeroPos);
             int[] rightPos = getRightPos(moved);
             
-            if((oldPos[0] - rightPos[0]) < (newPos[0] - rightPos[0])) {
-               son[3] = manDist + 1;
-            } else if((oldPos[1] - rightPos[1]) < (newPos[1] - rightPos[1])) {
-               son[3] = manDist + 1;
+            //System.out.println("Manhattan Dead: " + manDist);
+
+            if(Math.abs(oldPos[0] - rightPos[0]) < Math.abs(newPos[0] - rightPos[0])) {
+                son[4] = manDist + 1;
+                //System.out.println("Manhattan aumentato per la linea: " + (int)son[4]);
+            } else if(Math.abs(oldPos[1] - rightPos[1]) < Math.abs(newPos[1] - rightPos[1])) {
+                son[4] = manDist + 1;
+
+                //System.out.println("vecchia colonna: " + oldPos[1]);
+                //System.out.println("nuova colonna: " + newPos[1]);
+                //System.out.println("giusta colonna: " + rightPos[1]);
+
+                //System.out.println("Manhattan aumentato per la colonna: " + (int)son[4]);
             } else {
-                son[3] = manDist - 1;
+                son[4] = manDist - 1;
+                //System.out.println("Manhattan diminuito: " + (int)son[4]);
             }
 
             return son;
@@ -236,18 +316,25 @@ public class Board {
         // 1 place : str of son
         // 2 palce : int of the previuos moved number
         // 3 place : new zero position of the son
-        // 4 palce : new manhattan
-   
+        // 4 place : new zero index
+        // 5 palce : new manhattan
 
     public LinkedList<Board> getMoves() {
 
         LinkedList<Board> sons = new LinkedList<>();
         Object[] son;
 
+        //System.out.println("Starting board : \n" + bTiles.toString());
+
         for(int i = 1; i <= 4; i++) {
             Object[] newSon = makeMove(i);
-            if(newSon != null)
-                sons.add( new Board((StringBuilder)newSon[0], (int)newSon[2], (int)newSon[1], (int)newSon[3]) );
+            if(newSon != null) {
+                //System.out.println("figlio dir: " + i);
+                //System.out.println(((StringBuilder)newSon[0]).toString());
+                sons.add( new Board((StringBuilder)newSon[0], (int)newSon[2], (int)newSon[3], (int)newSon[1], (int)newSon[4]) );
+            }
+            //else 
+                //System.out.println("impossible movement dir: " + i);
         }
 
         return sons; 
@@ -265,28 +352,32 @@ public class Board {
         bTiles.deleteCharAt(bTiles.length() - 1);
     }
 
-    private int findZero() {
-        int counter = 0; 
+    private void findZero() {
+        int counter = 1; 
         for(int i = 0; i < bTiles.length(); i++) {
 
             if(bTiles.charAt(i) == ' ')
                 counter++;
             else if(bTiles.charAt(i) == '0') {
-                counter++;
-                return counter;    
+                //counter++;
+                zeroPos = counter;
+                zeroIndex = i;
             }
-
         }
-        return -1;
+    }
+
+    @Override
+    public String toString(){
+        return bTiles.toString();
     }
 
     @Override
     public boolean equals(Object o) {
-        return bTiles.equals((StringBuilder)o);
+        return (bTiles.toString()).equals(((Board)o).toString());
     }
 
     @Override
     public int hashCode() {
-        return toString().hashCode();
+        return (bTiles.toString()).hashCode();
     }
 }

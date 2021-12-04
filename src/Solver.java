@@ -7,7 +7,7 @@ import java.util.PriorityQueue;
 
 public class Solver {
 
-    public static StringBuilder endBoard;
+    public static String endBoard;
     public static int boardSize;
 
     public static void main(String[] args) {
@@ -37,6 +37,7 @@ public class Solver {
 
         boolean endFound = false;
 
+        //Some problem with this, do not know how but the queue is at finally empty WHYY
         HashMap<Board, Node> nodeMap = new HashMap<>();
 
         //Create the first node with zero moves
@@ -51,6 +52,11 @@ public class Solver {
         int i = 0;
 
         while(!endFound) {
+
+            //if((i++) == 3)
+                //break;
+            
+            //System.out.println("Size que: " + que.size());
             
             node = que.poll();
 
@@ -101,13 +107,12 @@ public class Solver {
 
     private static void setEndBoard() {
         int n = boardSize * boardSize;
-        endBoard  = new StringBuilder();
+        StringBuilder e  = new StringBuilder();
         for(int i = 1; i < n; i++) {
-            endBoard.append(i);
-            endBoard.append(" ");
+            e.append(i);
+            e.append(" ");
         }
-        endBoard.append("0");
-        endBoard.append(" ");
+        e.append("0");
+        endBoard = e.toString(); 
     }
-
 }
