@@ -4,8 +4,14 @@ import java.lang.Math;
 public class Board {
 
     //La matrice potrei eliminarla una volta avuto i figli
+    //
+    // La domanda e', quando mi servono le string builder e quando le Stringhe?
+    //
+    // Proviamo ad utilizzare solo esclusivamente el stringhe
+    
     private int[][] tiles;
     private StringBuilder bTiles;
+    private String strTiles;
     private int zeroPos;
     private int zeroIndex;
     private int prevMoved;
@@ -13,18 +19,18 @@ public class Board {
 
     public Board(int[][] tiles) {
         this.tiles = tiles;
-        toStrBuilder();
+        //toStrBuilder();
+        //strTiles = bTiles.toString();
+        strTiles = toStrFromMatrix();
         findZero();
         manDist = manhattan();
     }
 
-    private Board(StringBuilder s, int zPos, int zIndex, int moved, int manhattan) {
+    private Board(String s, int zPos, int zIndex, int moved, int manhattan) {
         tiles = null;
-        this.bTiles = s;
+        //bTiles = s;
+        strTiles = s;
         zeroPos = zPos;
-
-        //System.out.println("Zero pos: " + zeroPos);
-
         zeroIndex = zIndex;
         prevMoved = moved;            
         manDist = manhattan;
@@ -38,9 +44,11 @@ public class Board {
         return manDist;
     }
 
+    /*
     public StringBuilder getStrBuilder() {
         return bTiles;
     }
+    */
 
     public int manhattan() {
         if(tiles == null)
@@ -85,7 +93,7 @@ public class Board {
         //System.out.println("Direction: " + dir);
         Object[] son = null;
          
-        StringBuilder strSon = new StringBuilder(bTiles);
+        StringBuilder strSon = new StringBuilder(strTiles);
 
         int counter = 0; 
         int index = zeroIndex;
@@ -104,7 +112,7 @@ public class Board {
                
                 // go until find the right value to replace
                 while(index >= 0 && !done) {
-                    if(bTiles.charAt(index) == ' ' ) {
+                    if(strTiles.charAt(index) == ' ' ) {
 
                         counter++; 
 
@@ -136,8 +144,8 @@ public class Board {
                 index++; 
                
                 // go until find the right value to replace
-                while(index < bTiles.length() && !done) {
-                    if(bTiles.charAt(index) == ' ') {
+                while(index < strTiles.length() && !done) {
+                    if(strTiles.charAt(index) == ' ') {
 
                         counter++; 
 
@@ -168,7 +176,8 @@ public class Board {
             case 2: //right
                 index+=2;
 
-                if(index > bTiles.length())
+                //if(index > bTiles.length())
+                if(index > strTiles.length())
                     return null;
 
                 //Add the check to the line
@@ -180,7 +189,7 @@ public class Board {
 
                 otherIndex = index; //save the start of the number
 
-                while(index < bTiles.length() && bTiles.charAt(index) != ' ')
+                while(index < strTiles.length()  && strTiles.charAt(index) != ' ')
                     index++;
                 index--;
 
@@ -203,7 +212,7 @@ public class Board {
                     return null;
 
                 otherIndex = index;
-                while(index >= 0 && bTiles.charAt(index) != ' ')
+                while(index >= 0 && strTiles.charAt(index) != ' ')
                     index--;
                 index++;
 
@@ -332,7 +341,7 @@ public class Board {
             Object[] newSon = makeMove(i);
             if(newSon != null) {
                 //System.out.println("figlio dir: " + i + " - " +  ((StringBuilder)newSon[0]).toString());
-                sons.add( new Board((StringBuilder)newSon[0], (int)newSon[2], (int)newSon[3], (int)newSon[1], (int)newSon[4]) );
+                sons.add( new Board(((StringBuilder)newSon[0]).toString(), (int)newSon[2], (int)newSon[3], (int)newSon[1], (int)newSon[4]) );
             }
             //else 
                 //System.out.println("impossible movement dir: " + i);
@@ -341,8 +350,9 @@ public class Board {
         return sons; 
     }
 
-    private void toStrBuilder() {
-        bTiles = new StringBuilder();
+
+    private String toStrFromMatrix() {
+        StringBuilder bTiles = new StringBuilder();
 
         for(int i = 0; i < Solver.boardSize; i++) {
             for(int j = 0; j < Solver.boardSize; j++) {
@@ -351,17 +361,18 @@ public class Board {
         }
 
         bTiles.deleteCharAt(bTiles.length() - 1);
+        return bTiles.toString();
     }
 
     private void findZero() {
         int counter = 1; 
-        for(int i = 0; i < bTiles.length(); i++) {
+        for(int i = 0; i < strTiles.length(); i++) {
 
-            if(bTiles.charAt(i) == ' ')
+            if(strTiles.charAt(i) == ' ')
                 counter++;
-            else if(bTiles.charAt(i) == '0') {
-                if(i - 1 >=0 && bTiles.charAt(i - 1) == ' ') {
-                    if(i + 1 < bTiles.length() && bTiles.charAt(i + 1) == ' ') {
+            else if(strTiles.charAt(i) == '0') {
+                if(i - 1 >=0 && strTiles.charAt(i - 1) == ' ') {
+                    if(i + 1 < strTiles.length() && strTiles.charAt(i + 1) == ' ') {
                         zeroPos = counter;
                         zeroIndex = i;
                     }
@@ -370,33 +381,21 @@ public class Board {
         }
     }
 
-    private int getRightIndex() {
-        
-        for(int i = 0; i < bTiles.length(); i++) {
-
-            if(bTiles.charAt(i) == '0') {
-                if(i - 1 >=0 && bTiles.charAt(i - 1) == ' ') {
-                    if(i + 1 < bTiles.length() && bTiles.charAt(i + 1) == ' ') {
-                    }
-                    return i;
-                }
-            }
-        }
-        return -1;
-    }
-
     @Override
     public String toString(){
-        return bTiles.toString();
+        return strTiles;
+        //return bTiles.toString();
     }
 
     @Override
     public boolean equals(Object o) {
-        return (bTiles.toString()).equals(((Board)o).toString());
+        return strTiles.equals(((Board)o).toString());
+        //return (bTiles.toString()).equals(((Board)o).toString());
     }
 
     @Override
     public int hashCode() {
-        return (bTiles.toString()).hashCode();
+        return (strTiles).hashCode();
+        //return (bTiles.toString()).hashCode();
     }
 }
