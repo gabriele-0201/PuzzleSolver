@@ -11,7 +11,7 @@ public class Node implements Comparable<Node>{
         this.board = new Board(getTiles(strBoard));
         this.previous = previous;
         this.moves = moves;
-        score = this.board.manhattan() + this.moves;
+        this.score = this.board.manhattan() + this.moves;
     }
     
     //this constructuor is only called from inside so it could be private
@@ -19,7 +19,7 @@ public class Node implements Comparable<Node>{
         this.board = board;
         this.previous = previous;
         this.moves = moves;
-        score = this.board.getManDist() + this.moves;
+        this.score = this.board.getManDist() + this.moves;
     }
 
     public Node getPrevious() {
@@ -52,13 +52,12 @@ public class Node implements Comparable<Node>{
         return this.score == ((Node)o).score;
     }
 
-    //Maybe I could do that the board create already the board object son
-    //So the return of the get sons is already a list af board with all already done
-    
     public LinkedList<Node> getSons() {
         LinkedList<Node> sons = new LinkedList<>();
+        //get a list with all the son of the current board
         LinkedList<Board> moves = board.getMoves();
 
+        //adding one move for the all the son
         int sonsMoves = this.moves + 1;
 
         //System.out.println("Dead: " + board + " manhattan: " + board.getManDist());

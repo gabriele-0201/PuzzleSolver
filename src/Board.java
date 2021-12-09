@@ -2,12 +2,6 @@ import java.util.LinkedList;
 import java.lang.Math;
 
 public class Board {
-
-    //La matrice potrei eliminarla una volta avuto i figli
-    //
-    // La domanda e', quando mi servono le string builder e quando le Stringhe?
-    //
-    // Proviamo ad utilizzare solo esclusivamente el stringhe
     
     private int[][] tiles;
     private StringBuilder bTiles;
@@ -17,10 +11,9 @@ public class Board {
     private int prevMoved;
     private int manDist;
 
+    //constructor for the first matrix
     public Board(int[][] tiles) {
         this.tiles = tiles;
-        //toStrBuilder();
-        //strTiles = bTiles.toString();
         strTiles = toStrFromMatrix();
         findZero();
         manDist = manhattan();
@@ -28,7 +21,6 @@ public class Board {
 
     private Board(String s, int zPos, int zIndex, int moved, int manhattan) {
         tiles = null;
-        //bTiles = s;
         strTiles = s;
         zeroPos = zPos;
         zeroIndex = zIndex;
@@ -44,16 +36,7 @@ public class Board {
         return manDist;
     }
 
-    /*
-    public StringBuilder getStrBuilder() {
-        return bTiles;
-    }
-    */
-
     public int manhattan() {
-        if(tiles == null)
-            return -1;
-
         int sum = 0;
         for(int i = 0; i < Solver.boardSize; i++) {
             for(int j = 0; j < Solver.boardSize; j++) {
@@ -65,7 +48,6 @@ public class Board {
                     num = tiles[i][j];
 
                 int[] rightPos = getRightPos(num);
-
                 sum += Math.abs(rightPos[0] - i) + Math.abs(rightPos[1] - j); 
             }
         }
@@ -79,16 +61,7 @@ public class Board {
         return rightPos;
     }
 
-    // --> Have to decide if return direct the right array af Object with all the information
-    //Or return only the string builder
-    //
-    //OBVIOUSLY is better the first idea
-    //
     //dir: 1 - up, 2 - right, 3 - down, 4 - left
-    //
-    //
-    //ATTENZIONE DIFFERENZA TRA INDEXZERO E ZEROPOS
-    //
     private Object[] makeMove(int dir) {
         //System.out.println("Direction: " + dir);
         Object[] son = null;
@@ -160,9 +133,8 @@ public class Board {
                     index++; 
                 }
                 
-                //TODO have to check if the while is finished BEFORE finding a new space
+                //check if the while is finished BEFORE finding a new space
                 //so the done variable is not set to true
-                
                 if(!done && counter == Solver.boardSize - 1) {
                     done = true;
                     index--;
@@ -231,7 +203,7 @@ public class Board {
                 case 1:
                 case 4:
 
-                    strMoved = strSon.substring(index, otherIndex + 1);
+                    strMoved = strTiles.substring(index, otherIndex + 1);
                     moved = Integer.parseInt(strMoved);
 
                     //System.out.println("Number to move: " + moved);
@@ -248,7 +220,7 @@ public class Board {
                 case 3:
                 case 2:
 
-                    strMoved = strSon.substring(otherIndex, index + 1);
+                    strMoved = strTiles.substring(otherIndex, index + 1);
                     moved = Integer.parseInt(strMoved);
 
                     //System.out.println("Number to move: " + moved);
