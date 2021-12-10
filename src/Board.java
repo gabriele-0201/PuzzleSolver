@@ -17,6 +17,7 @@ public class Board {
         strTiles = toStrFromMatrix();
         findZero();
         manDist = manhattan();
+        manDist += initialLibearConflicts(strTiles, zeroPos);
     }
 
     private Board(String s, int zPos, int zIndex, int moved, int manhattan) {
@@ -237,7 +238,7 @@ public class Board {
             }
 
             son = new Object[5];
-            son[0] = strSon;
+            son[0] = strSon.toString();
             son[1] = moved;
             
             int[] oldPos = null;
@@ -270,29 +271,110 @@ public class Board {
             
             int[] newPos = getRightPos(zeroPos);
             int[] rightPos = getRightPos(moved);
+            int newManDist;
             
-            //System.out.println("Manhattan Dead: " + manDist);
-
             if(Math.abs(oldPos[0] - rightPos[0]) < Math.abs(newPos[0] - rightPos[0])) {
-                son[4] = manDist + 1;
-                //System.out.println("Manhattan aumentato per la linea: " + (int)son[4]);
+                newManDist = manDist + 1;
             } else if(Math.abs(oldPos[1] - rightPos[1]) < Math.abs(newPos[1] - rightPos[1])) {
-                son[4] = manDist + 1;
-
-                //System.out.println("vecchia colonna: " + oldPos[1]);
-                //System.out.println("nuova colonna: " + newPos[1]);
-                //System.out.println("giusta colonna: " + rightPos[1]);
-
-                //System.out.println("Manhattan aumentato per la colonna: " + (int)son[4]);
+                newManDist = manDist + 1;
             } else {
-                son[4] = manDist - 1;
-                //System.out.println("Manhattan diminuito: " + (int)son[4]);
+                newManDist = manDist - 1;
             }
+
+            //the zeroPos should be the position of the the just moved number
+            //I have to pass also the new string board
+            manDist += initialLibearConflicts((String)son[0], (int)son[2]);
+            son[4] = manDist;
+            //here change with the more efficent version
 
             return son;
         }
 
         return null;
+    }
+
+    private int initialLibearConflicts(String tilesToCheck, int newZeroPos) {
+        int counterConflits = 0;
+        int currentPos = 1;
+        int startNumb, endNumb;
+        int index = 0;
+        int indexConflits = 0;
+
+
+        System.out.println("Board: " + tilesToCheck);
+
+        //first scann all the number in the board
+        while(currentPos <= Solver.boardSize * Solver.boardSize){
+            //for each element of the board I have to scan the line and the column
+            //and seacrh for the linear conflicts
+
+            //iterate while find a space and find the integer
+
+            startNumb = index; //save the start of the number
+            while(index < tilesToCheck.length()  && tilesToCheck.charAt(index) != ' ')
+                index++;
+            //set the index of the end number, one more for the subsstring
+            endNumb = index;
+            //skip the space
+            index++;
+
+            currentPos++;
+            System.out.println(currentPos);
+            System.out.println(newZeroPos);
+            
+            //minus one because we point already to the next
+            if(currentPos - 1 == newZeroPos)
+                continue;
+
+            int chekingNumb = Integer.parseInt(tilesToCheck.substring(startNumb, endNumb));
+
+            // check conflits on the right
+            boolean endLine = true; 
+            indexConflits = index;
+            int possConflictsCounter = 0;
+        
+            System.out.println("Number checking: " + chekingNumb);
+
+            while(!endLine) {
+
+                startNumb = index; 
+                while(index < tilesToCheck.length()  && tilesToCheck.charAt(index) != ' ')
+                    index++;
+                endNumb = index;
+                index++;
+
+                possConflictsCounter++;
+                
+                int toChekNumb = Integer.parseInt(tilesToCheck.substring(startNumb, endNumb));
+
+                int[] checking = getRightPos(chekingNumb);
+                int[] toCheck = getRightPos(toChekNumb);
+
+                if(checking[0] != toCheck[0])
+                    endLine = true;
+                else if(checking[1] - toCheck[1] == possConflictsCounter - zeroPos){
+                    counterConflits++;
+                    System.out.println("Conflits with: " + toChekNumb);
+                }
+            }
+            
+            // check conflits on left
+            
+        
+            // check conflits up
+             
+            
+            // cech conflits down 
+        }
+
+        return counterConflits;
+
+
+    }
+
+    private int linearConflicts(String b) {
+        //Have to check all the line of the initiial 
+        return 0;
     }
 
         // work with all sons 
@@ -313,7 +395,7 @@ public class Board {
             Object[] newSon = makeMove(i);
             if(newSon != null) {
                 //System.out.println("figlio dir: " + i + " - " +  ((StringBuilder)newSon[0]).toString());
-                sons.add( new Board(((StringBuilder)newSon[0]).toString(), (int)newSon[2], (int)newSon[3], (int)newSon[1], (int)newSon[4]) );
+                sons.add( new Board((String)newSon[0], (int)newSon[2], (int)newSon[3], (int)newSon[1], (int)newSon[4]));
             }
             //else 
                 //System.out.println("impossible movement dir: " + i);
