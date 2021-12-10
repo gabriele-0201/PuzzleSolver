@@ -16,6 +16,10 @@ public class Board {
         this.tiles = tiles;
         strTiles = toStrFromMatrix();
         findZero();
+
+        System.out.println("Zero index from borning: " + zeroIndex);
+        System.out.println("Zero Position borning: " + zeroPos);
+
         manDist = manhattan();
         manDist += initialLibearConflicts(strTiles, zeroPos);
     }
@@ -77,7 +81,8 @@ public class Board {
         int moved = -1;
         boolean done = false;
         
-        //System.out.println("Starting index: " + index);
+        System.out.println("Zero index: " + index);
+        System.out.println("Zero Position: " + zeroPos);
         //System.out.println("right index" + getRightIndex());
         switch(dir) {
             case 1: //up
@@ -108,7 +113,7 @@ public class Board {
                 } else if(!done) 
                     return null;
 
-                //System.out.println(index + " " + otherIndex);
+                System.out.println(index + " " + otherIndex);
 
                 break;
 
@@ -207,7 +212,7 @@ public class Board {
                     strMoved = strTiles.substring(index, otherIndex + 1);
                     moved = Integer.parseInt(strMoved);
 
-                    //System.out.println("Number to move: " + moved);
+                    System.out.println("Number to move: " + moved);
 
                     if (prevMoved == moved)
                         return null;
@@ -301,10 +306,10 @@ public class Board {
         int indexConflits = 0;
 
 
-        System.out.println("Board: " + tilesToCheck);
+        //System.out.println("Board: " + tilesToCheck);
 
         //first scann all the number in the board
-        while(currentPos <= Solver.boardSize * Solver.boardSize){
+        while(currentPos < Solver.boardSize * Solver.boardSize){
             //for each element of the board I have to scan the line and the column
             //and seacrh for the linear conflicts
 
@@ -319,9 +324,7 @@ public class Board {
             index++;
 
             currentPos++;
-            System.out.println(currentPos);
-            System.out.println(newZeroPos);
-            
+
             //minus one because we point already to the next
             if(currentPos - 1 == newZeroPos)
                 continue;
@@ -329,21 +332,20 @@ public class Board {
             int chekingNumb = Integer.parseInt(tilesToCheck.substring(startNumb, endNumb));
 
             // check conflits on the right
-            boolean endLine = true; 
+            boolean endLine = false; 
             indexConflits = index;
-            int possConflictsCounter = 0;
+            int conflitPos = zeroPos;
         
-            System.out.println("Number checking: " + chekingNumb);
 
             while(!endLine) {
 
-                startNumb = index; 
-                while(index < tilesToCheck.length()  && tilesToCheck.charAt(index) != ' ')
-                    index++;
-                endNumb = index;
-                index++;
+                startNumb = indexConflits; 
+                while(indexConflits < tilesToCheck.length()  && tilesToCheck.charAt(indexConflits) != ' ')
+                   indexConflits++;
+                endNumb = indexConflits;
+                indexConflits ++;
 
-                possConflictsCounter++;
+                conflitPos++;
                 
                 int toChekNumb = Integer.parseInt(tilesToCheck.substring(startNumb, endNumb));
 
@@ -352,9 +354,10 @@ public class Board {
 
                 if(checking[0] != toCheck[0])
                     endLine = true;
-                else if(checking[1] - toCheck[1] == possConflictsCounter - zeroPos){
+                else if(checking[1] - toCheck[1] == conflitPos - zeroPos){
                     counterConflits++;
-                    System.out.println("Conflits with: " + toChekNumb);
+                    System.out.println("Board: " + tilesToCheck);
+                    System.out.println("Conflits between:: " + chekingNumb + " " + toChekNumb);
                 }
             }
             
@@ -389,16 +392,16 @@ public class Board {
         LinkedList<Board> sons = new LinkedList<>();
         Object[] son;
 
-        //System.out.println("Starting board : \n" + bTiles.toString());
+        System.out.println("Starting board : \n" + strTiles);
 
         for(int i = 1; i <= 4; i++) {
             Object[] newSon = makeMove(i);
             if(newSon != null) {
-                //System.out.println("figlio dir: " + i + " - " +  ((StringBuilder)newSon[0]).toString());
+                System.out.println("figlio dir: " + i + " - " +  ((String)newSon[0]));
                 sons.add( new Board((String)newSon[0], (int)newSon[2], (int)newSon[3], (int)newSon[1], (int)newSon[4]));
             }
-            //else 
-                //System.out.println("impossible movement dir: " + i);
+            else 
+                System.out.println("impossible movement dir: " + i);
         }
 
         return sons; 
@@ -425,11 +428,21 @@ public class Board {
             if(strTiles.charAt(i) == ' ')
                 counter++;
             else if(strTiles.charAt(i) == '0') {
+
+                //TODO A PROPER IF
+
                 if(i - 1 >=0 && strTiles.charAt(i - 1) == ' ') {
                     if(i + 1 < strTiles.length() && strTiles.charAt(i + 1) == ' ') {
                         zeroPos = counter;
                         zeroIndex = i;
                     }
+                    else {
+                        zeroPos = ;
+                        zeroIndex = i;
+                    }
+                } else {
+                        zeroPos = counter;
+                        zeroIndex = i;
                 }
             }
         }
