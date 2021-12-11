@@ -17,8 +17,8 @@ public class Board {
         strTiles = toStrFromMatrix();
         findZero();
 
-        System.out.println("Zero index from borning: " + zeroIndex);
-        System.out.println("Zero Position borning: " + zeroPos);
+        //System.out.println("Zero index from borning: " + zeroIndex);
+        //System.out.println("Zero Position borning: " + zeroPos);
 
         manDist = manhattan();
         manDist += initialLibearConflicts(strTiles, zeroPos);
@@ -81,8 +81,8 @@ public class Board {
         int moved = -1;
         boolean done = false;
         
-        System.out.println("Zero index: " + index);
-        System.out.println("Zero Position: " + zeroPos);
+        //System.out.println("Zero index: " + index);
+        //System.out.println("Zero Position: " + zeroPos);
         //System.out.println("right index" + getRightIndex());
         switch(dir) {
             case 1: //up
@@ -113,7 +113,7 @@ public class Board {
                 } else if(!done) 
                     return null;
 
-                System.out.println(index + " " + otherIndex);
+                //System.out.println(index + " " + otherIndex);
 
                 break;
 
@@ -183,7 +183,7 @@ public class Board {
 
                 if(index < 0)
                     return null;
-
+                
                 //Add the check to the line
                 // The right number have to be in the same position of the previous 
                 if((zeroPos - 1) / Solver.boardSize != (zeroPos - 2) / Solver.boardSize )
@@ -212,7 +212,7 @@ public class Board {
                     strMoved = strTiles.substring(index, otherIndex + 1);
                     moved = Integer.parseInt(strMoved);
 
-                    System.out.println("Number to move: " + moved);
+                    //System.out.println("Number to move: " + moved);
 
                     if (prevMoved == moved)
                         return null;
@@ -352,17 +352,58 @@ public class Board {
                 int[] checking = getRightPos(chekingNumb);
                 int[] toCheck = getRightPos(toChekNumb);
 
-                if(checking[0] != toCheck[0])
+                if(indexConflits >= tilesToCheck.length() || checking[0] != toCheck[0])
                     endLine = true;
                 else if(checking[1] - toCheck[1] == conflitPos - zeroPos){
                     counterConflits++;
-                    System.out.println("Board: " + tilesToCheck);
-                    System.out.println("Conflits between:: " + chekingNumb + " " + toChekNumb);
+                    //System.out.println("Board: " + tilesToCheck);
+                    //System.out.println("Conflits between:: " + chekingNumb + " " + toChekNumb);
                 }
             }
             
             // check conflits on left
+            // now the index point to the right number we are working with
+            boolean endLine = false; 
+            indexConflits = index;
+
+            // search for the right number to start (the first on the left)
+            int spaceounter = 0;
+            while(indexConflits >= 0  && tilesToCheck.charAt(indexConflits) != ' ') {
+                spaceounter++;
+                indexConflits--;
+                if(spaceounter = 2)
+                    break;
+            }
             
+            //if searching for the left value we finish the stirng is done
+            if(indexConflits < 0)
+                endLine = true;
+
+            int conflitPos = zeroPos;
+
+            while(!endLine) {
+
+                startNumb = indexConflits; 
+                while(indexConflits >= 0  && tilesToCheck.charAt(indexConflits) != ' ')
+                   indexConflits--;
+                endNumb = indexConflits;
+                indexConflits --;
+
+                conflitPos++;
+                
+                int toChekNumb = Integer.parseInt(tilesToCheck.substring(startNumb, endNumb));
+
+                int[] checking = getRightPos(chekingNumb);
+                int[] toCheck = getRightPos(toChekNumb);
+
+                if(indexConflits >= tilesToCheck.length() || checking[0] != toCheck[0])
+                    endLine = true;
+                else if(checking[1] - toCheck[1] == conflitPos - zeroPos){
+                    counterConflits++;
+                    //System.out.println("Board: " + tilesToCheck);
+                    //System.out.println("Conflits between:: " + chekingNumb + " " + toChekNumb);
+                }
+            }
         
             // check conflits up
              
@@ -428,22 +469,22 @@ public class Board {
             if(strTiles.charAt(i) == ' ')
                 counter++;
             else if(strTiles.charAt(i) == '0') {
-
-                //TODO A PROPER IF
-
-                if(i - 1 >=0 && strTiles.charAt(i - 1) == ' ') {
-                    if(i + 1 < strTiles.length() && strTiles.charAt(i + 1) == ' ') {
+                
+                //this could be done better
+                //chek before is at the start
+                if(i - 1 < 0) {
+                        zeroPos = counter;
+                        zeroIndex = i;
+                } else if(strTiles.charAt(i - 1) == ' ') {
+                    
+                    if(i + 1 >= strTiles.length()) {
+                        zeroPos = counter;
+                        zeroIndex = i;
+                    } else if(strTiles.charAt(i + 1) == ' ') {
                         zeroPos = counter;
                         zeroIndex = i;
                     }
-                    else {
-                        zeroPos = ;
-                        zeroIndex = i;
-                    }
-                } else {
-                        zeroPos = counter;
-                        zeroIndex = i;
-                }
+                } 
             }
         }
     }
