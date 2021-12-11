@@ -305,13 +305,12 @@ public class Board {
         int index = 0;
         int indexConflits = 0;
 
-
         //System.out.println("Board: " + tilesToCheck);
 
         //first scann all the number in the board
         while(currentPos < Solver.boardSize * Solver.boardSize){
             //for each element of the board I have to scan the line and the column
-            //and seacrh for the linear conflicts
+            //and seacrh for the linear conflicts;
 
             //iterate while find a space and find the integer
 
@@ -330,14 +329,25 @@ public class Board {
                 continue;
 
             int chekingNumb = Integer.parseInt(tilesToCheck.substring(startNumb, endNumb));
+            int[] checking = getRightPos(chekingNumb);
+            //System.out.println("checking num: " + chekingNumb);
+            //System.out.println("Curerent pos: " + currentPos - 1);
+            int[] currentPositionTiles = getRightPos(currentPos - 1);
 
-            // check conflits on the right
+            boolean possibleLinearC = true;
+            boolean possibleColumnC = true;
+
+            //if the number we are checking is not in his line could not create a linear conflict
+            if(checking[0] != currentPositionTiles[0])
+                possibleLinearC = false;
+
+            // check conflits on the RIGHT
             boolean endLine = false; 
             indexConflits = index;
-            int conflitPos = zeroPos;
-        
+            int conflitPos = currentPos - 1;
+            //System.out.println("ZERO POS: " + zeroPos);
 
-            while(!endLine) {
+            while(possibleLinearC && !endLine) {
 
                 startNumb = indexConflits; 
                 while(indexConflits < tilesToCheck.length()  && tilesToCheck.charAt(indexConflits) != ' ')
@@ -349,56 +359,65 @@ public class Board {
                 
                 int toChekNumb = Integer.parseInt(tilesToCheck.substring(startNumb, endNumb));
 
-                int[] checking = getRightPos(chekingNumb);
                 int[] toCheck = getRightPos(toChekNumb);
+                //System.out.println("conflict pos " + conflitPos);
+                int[] toCheckPosTiles = getRightPos(conflitPos);
 
-                if(indexConflits >= tilesToCheck.length() || checking[0] != toCheck[0])
+                if(indexConflits >= tilesToCheck.length() ||  (currentPositionTiles[0] != toCheckPosTiles[0] ||  checking[0] != toCheck[0]))
                     endLine = true;
-                else if(checking[1] - toCheck[1] == conflitPos - zeroPos){
+                else if (currentPositionTiles[1] == toCheck[1] && toCheckPosTiles[1] == checking[1]) {
                     counterConflits++;
                     //System.out.println("Board: " + tilesToCheck);
                     //System.out.println("Conflits between:: " + chekingNumb + " " + toChekNumb);
                 }
             }
             
-            // check conflits on left
+            // check conflits on LEFT
             // now the index point to the right number we are working with
-            boolean endLine = false; 
-            indexConflits = index;
+            endLine = false; 
+            // - 2 becouse we have to go back and SKIP the space and go to the end of the previous number
+            indexConflits = index - 2;
 
             // search for the right number to start (the first on the left)
-            int spaceounter = 0;
+            int spaceCount = 0;
             while(indexConflits >= 0  && tilesToCheck.charAt(indexConflits) != ' ') {
-                spaceounter++;
+                //spaceCount++;
                 indexConflits--;
-                if(spaceounter = 2)
-                    break;
+                //if(spaceCount == 2)
+                    //break;
             }
-            
+            indexConflits--;
+
             //if searching for the left value we finish the stirng is done
             if(indexConflits < 0)
                 endLine = true;
 
-            int conflitPos = zeroPos;
+            conflitPos = currentPos - 1;
 
-            while(!endLine) {
+            //System.out.println("Index in the string" + indexConflits);
 
-                startNumb = indexConflits; 
+            while(possibleLinearC && !endLine) {
+
+                endNumb = indexConflits + 1; 
                 while(indexConflits >= 0  && tilesToCheck.charAt(indexConflits) != ' ')
                    indexConflits--;
-                endNumb = indexConflits;
+                startNumb = indexConflits + 1;
+                //go to the next number
                 indexConflits --;
+
+                //System.out.println("Start Number" + startNumb);
+                //System.out.println("End Number" + endNumb);
 
                 conflitPos++;
                 
                 int toChekNumb = Integer.parseInt(tilesToCheck.substring(startNumb, endNumb));
 
-                int[] checking = getRightPos(chekingNumb);
                 int[] toCheck = getRightPos(toChekNumb);
+                int[] toCheckPosTiles = getRightPos(conflitPos);
 
-                if(indexConflits >= tilesToCheck.length() || checking[0] != toCheck[0])
+                if(indexConflits < 0 || currentPositionTiles[0] != toCheckPosTiles[0] ||  checking[0] != toCheck[0])
                     endLine = true;
-                else if(checking[1] - toCheck[1] == conflitPos - zeroPos){
+                else if (currentPositionTiles[1] == toCheck[1] && toCheckPosTiles[1] == checking[1]) {
                     counterConflits++;
                     //System.out.println("Board: " + tilesToCheck);
                     //System.out.println("Conflits between:: " + chekingNumb + " " + toChekNumb);
@@ -433,16 +452,16 @@ public class Board {
         LinkedList<Board> sons = new LinkedList<>();
         Object[] son;
 
-        System.out.println("Starting board : \n" + strTiles);
+        //System.out.println("Starting board : \n" + strTiles);
 
         for(int i = 1; i <= 4; i++) {
             Object[] newSon = makeMove(i);
             if(newSon != null) {
-                System.out.println("figlio dir: " + i + " - " +  ((String)newSon[0]));
+                //System.out.println("figlio dir: " + i + " - " +  ((String)newSon[0]));
                 sons.add( new Board((String)newSon[0], (int)newSon[2], (int)newSon[3], (int)newSon[1], (int)newSon[4]));
             }
-            else 
-                System.out.println("impossible movement dir: " + i);
+            //else 
+                //System.out.println("impossible movement dir: " + i);
         }
 
         return sons; 

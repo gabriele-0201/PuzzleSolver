@@ -53,8 +53,8 @@ public class Solver {
 
         while(!endFound) {
 
-            //if((i++) == 3)
-                //break;
+            if((i++) == 3)
+                break;
             
             //System.out.println("Size que: " + que.size());
             
