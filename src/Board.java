@@ -425,9 +425,52 @@ public class Board {
             }
         
             // check conflits up
-             
+            endLine = false;
+            // TODO check if this is correnct, maybe some offset needed
+            indexConflits = index;
+            counter = -1;
             
-            // cech conflits down 
+            boolean endColumn = false;
+            while(possibleColumnC && !endColumn) {
+
+                //TODO fix this to work in this method
+                //serch the number to check
+                // go until find the right value
+                while(index >= 0 && !done) {
+                    if(strTiles.charAt(index) == ' ' ) {
+                
+                         counter++; 
+                
+                         if (counter == Solver.boardSize - 1){
+                             otherIndex = index - 1;
+                         }
+                         else if (counter >= Solver.boardSize) {
+                             done = true;
+                             index += 2;
+                         }
+                
+                     }
+                     index--; 
+                 }
+
+
+                //if is finishd the columns END THE LINE
+                
+                
+                
+                //remember to check the position of the column and the value we are cheking
+                //check if there is a conflit between the numbers
+
+            }
+
+                 //TODO pay attenction to this, maybe usefull
+                 if(!done && counter == Solver.boardSize - 1) {
+                     done = true;
+                     index++;
+                 } else if(!done) 
+                     return null;
+                
+                 // cech conflits down 
         }
 
         return counterConflits;
