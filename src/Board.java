@@ -17,10 +17,6 @@ public class Board {
         this.tiles = tiles;
         strTiles = toStrFromMatrix();
         findZero();
-
-        //System.out.println("Zero index from borning: " + zeroIndex);
-        //System.out.println("Zero Position borning: " + zeroPos);
-
         manDist = manhattan();
         linConflit = initialLibearConflicts();
     }
@@ -316,7 +312,7 @@ public class Board {
         int index = 0;
         int indexConflits = 0;
 
-        //System.out.println("Board: " + tilesToCheck);
+        System.out.println("Board: " + strTiles);
         //the values has to be in the column they have to be
 
 
@@ -419,7 +415,7 @@ public class Board {
                     //System.out.println("CONFLIT");
                     //System.out.println("RIGHT");
                     //System.out.println(strTiles);
-                    //System.out.println("Conflits between:: " + chekingNumb + " " + toChekNumb);
+                    System.out.println("Conflits between:: " + chekingNumb + " " + toChekNumb);
                 }
 
                 //if the next number is on a the line stop
@@ -509,7 +505,7 @@ public class Board {
                     //System.out.println("CONFLIT");
                     //System.out.println("DOWN");
                     //System.out.println(strTiles);
-                    //System.out.println("Conflits between:: " + chekingNumb + " " + toChekNumb);
+                    System.out.println("Conflits between:: " + chekingNumb + " " + toChekNumb);
                 }
 
                 if(indexConflits > strTiles.length())
@@ -519,8 +515,6 @@ public class Board {
         }
 
         return counterConflits;
-
-
     }
 
     private int linearConflicts(String b) {
