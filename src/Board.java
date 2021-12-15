@@ -60,6 +60,9 @@ public class Board {
     }
 
     private int[] getRightPos(int v) {
+
+        if(v == 0) return new int[] {Solver.boardSize - 1, Solver.boardSize - 1};
+
         int[] rightPos = new int[2];
         rightPos[0]= (v - 1) / Solver.boardSize;
         rightPos[1] = (v - (rightPos[0] * Solver.boardSize)) - 1;
@@ -308,7 +311,7 @@ public class Board {
         //System.out.println("Board: " + tilesToCheck);
 
         //first scann all the number in the board
-        while(currentPos < Solver.boardSize * Solver.boardSize){
+        while(currentPos <= Solver.boardSize * Solver.boardSize){
             //for each element of the board I have to scan the line and the column
             //and seacrh for the linear conflicts;
 
@@ -325,6 +328,7 @@ public class Board {
             currentPos++;
 
             //minus one because we point already to the next
+            //is not a conflit with zero
             if(currentPos - 1 == newZeroPos)
                 continue;
 
@@ -347,6 +351,9 @@ public class Board {
             int conflitPos = currentPos - 1;
             //System.out.println("ZERO POS: " + zeroPos);
 
+            if(indexConflits > tilesToCheck.length())
+                endLine = true;
+
             while(possibleLinearC && !endLine) {
 
                 startNumb = indexConflits; 
@@ -368,6 +375,7 @@ public class Board {
                 else if (currentPositionTiles[1] == toCheck[1] && toCheckPosTiles[1] == checking[1]) {
                     counterConflits++;
                     //System.out.println("Board: " + tilesToCheck);
+                    //System.out.println("RIGHT");
                     //System.out.println("Conflits between:: " + chekingNumb + " " + toChekNumb);
                 }
             }
@@ -380,12 +388,8 @@ public class Board {
 
             // search for the right number to start (the first on the left)
             int spaceCount = 0;
-            while(indexConflits >= 0  && tilesToCheck.charAt(indexConflits) != ' ') {
-                //spaceCount++;
+            while(indexConflits >= 0  && tilesToCheck.charAt(indexConflits) != ' ') 
                 indexConflits--;
-                //if(spaceCount == 2)
-                    //break;
-            }
             indexConflits--;
 
             //if searching for the left value we finish the stirng is done
@@ -408,40 +412,56 @@ public class Board {
                 //System.out.println("Start Number" + startNumb);
                 //System.out.println("End Number" + endNumb);
 
-                conflitPos++;
+                conflitPos--;
                 
                 int toChekNumb = Integer.parseInt(tilesToCheck.substring(startNumb, endNumb));
 
                 int[] toCheck = getRightPos(toChekNumb);
                 int[] toCheckPosTiles = getRightPos(conflitPos);
-
+                /*
+                System.out.println("checking with " + chekingNumb);
+                System.out.println("to check number " + toChekNumb);
+                System.out.println("position to check " + conflitPos);
+                */
                 if(indexConflits < 0 || currentPositionTiles[0] != toCheckPosTiles[0] ||  checking[0] != toCheck[0])
                     endLine = true;
                 else if (currentPositionTiles[1] == toCheck[1] && toCheckPosTiles[1] == checking[1]) {
                     counterConflits++;
                     //System.out.println("Board: " + tilesToCheck);
+                    //System.out.println("LEFT");
                     //System.out.println("Conflits between:: " + chekingNumb + " " + toChekNumb);
                 }
             }
         
             // check conflits UP
-            endLine = false;
-            // TODO check if this is correnct, maybe some offset needed
-            indexConflits = index - 1;
-            
             boolean endColumn = false;
+            // Go back to the first value before the checking number
+            indexConflits = index - 2;
+
+            // search for the right number to start (the first on the left)
+            //int spaceCount = 0;
+            while(indexConflits >= 0  && tilesToCheck.charAt(indexConflits) != ' ')
+                indexConflits--;
+            indexConflits--;
+
+            //if searching for the left value we finish the stirng is done
+            if(indexConflits < 0)
+                endColumn = true;
+
+            conflitPos = currentPos - 1;
+
+            //System.out.println("board " + tilesToCheck);
             while(possibleColumnC && !endColumn) {
 
-                //TODO fix this to work in this method
                 //serch the number to check
                 // go until find the right value
                 boolean done = false;
-                int counter = -1;
+                int counter = 0;
                 while(indexConflits >= 0 && !done) {
-                    if(strTiles.charAt(index) == ' ' ) {
+                    if(tilesToCheck.charAt(indexConflits) == ' ' ) {
                         counter++; 
                         if (counter == Solver.boardSize - 1){
-                            endNumb = indexConflits - 1;
+                            endNumb = indexConflits;
                         }
                         else if (counter >= Solver.boardSize) {
                             done = true;
@@ -455,23 +475,130 @@ public class Board {
 
                 //if is finishd the columns END THE LINE
                 if(!done && (counter == Solver.boardSize - 1)) {
+                    done = true;
                     startNumb = indexConflits + 2;
                 } else if(!done) {
-                    System.out.println("finished column");
+                    //System.out.println("finished column");
                     endColumn = true;
                     continue;
                 }
 
+                conflitPos -= Solver.boardSize; 
                 
-                System.out.println("Start Number" + startNumb);
-                System.out.println("End Number" + endNumb);
+                //System.out.println("Start Number" + startNumb);
+                //System.out.println("End Number" + endNumb);
                 
                 //remember to check the position of the column and the value we are cheking
                 //check if there is a conflit between the numbers
+                
+                int toChekNumb = Integer.parseInt(tilesToCheck.substring(startNumb, endNumb));
+                
+                
+                /*
+                System.out.println("checking with " + chekingNumb);
+                System.out.println("to check number " + toChekNumb);
+                System.out.println("position to check " + conflitPos);
+                */
+                int[] toCheck = getRightPos(toChekNumb);
+                int[] toCheckPosTiles = getRightPos(conflitPos);
+                /*
+                System.out.println("number coumn " + checking[1]);
+                System.out.println("to check number coumn " + toCheck[1]);
+                System.out.println("current colum" + currentPositionTiles[1]);
+                System.out.println("position to check colum" + toCheckPosTiles[1]);
+
+                System.out.println("INDEX CONFLITSSSS " + indexConflits);
+                */
+                if((indexConflits < 0 && !done) || currentPositionTiles[1] != toCheckPosTiles[1] ||  checking[1] != toCheck[1])
+                    endLine = true;
+                else if (currentPositionTiles[0] == toCheck[0] && toCheckPosTiles[0] == checking[0]) {
+                    counterConflits++;
+                    //System.out.println("Board: " + tilesToCheck);
+                    //System.out.println("UP");
+                    //System.out.println("Conflits between:: " + chekingNumb + " " + toChekNumb);
+                }
 
             }
                 
-                // cech conflits down 
+            // cech conflits DOWN
+            endColumn = false;
+            // set the first index of the right number
+            indexConflits = index;
+
+            //if searching for the left value we finish the stirng is done
+            if(indexConflits > tilesToCheck.length())
+                endColumn = true;
+
+            conflitPos = currentPos - 1;
+
+            //System.out.println("board " + tilesToCheck);
+            while(possibleColumnC && !endColumn) {
+
+                //serch the number to check
+                // go until find the right value
+                boolean done = false;
+                int counter = 0;
+                while(indexConflits < tilesToCheck.length() && !done) {
+                    if(tilesToCheck.charAt(indexConflits) == ' ' ) {
+                        counter++; 
+                        if (counter == Solver.boardSize - 1){
+                            startNumb = indexConflits + 1;
+                        }
+                        else if (counter >= Solver.boardSize) {
+                            done = true;
+                            endNumb = indexConflits;
+                        }
+                
+                    }
+                    indexConflits++; 
+                }
+                indexConflits++; 
+
+                //if is finishd the columns END THE LINE
+                if(!done && (counter == Solver.boardSize - 1)) {
+                    done = true;
+                    endNumb = indexConflits - 1;
+                } else if(!done) {
+                    //System.out.println("finished column");
+                    endColumn = true;
+                    continue;
+                }
+
+                conflitPos += Solver.boardSize; 
+                
+                //System.out.println("Start Number" + startNumb);
+                //System.out.println("End Number" + endNumb);
+                
+                //remember to check the position of the column and the value we are cheking
+                //check if there is a conflit between the numbers
+                
+                int toChekNumb = Integer.parseInt(tilesToCheck.substring(startNumb, endNumb));
+                
+                /* 
+                System.out.println("checking with " + chekingNumb);
+                System.out.println("to check number " + toChekNumb);
+                System.out.println("position to check " + conflitPos);
+                */
+                int[] toCheck = getRightPos(toChekNumb);
+                int[] toCheckPosTiles = getRightPos(conflitPos);
+                /*
+                System.out.println("number coumn " + checking[1]);
+                System.out.println("to check number coumn " + toCheck[1]);
+                System.out.println("current colum" + currentPositionTiles[1]);
+                System.out.println("position to check colum" + toCheckPosTiles[1]);
+
+                System.out.println("INDEX CONFLITSSSS " + indexConflits);
+                */
+                if((indexConflits < 0 && !done) || currentPositionTiles[1] != toCheckPosTiles[1] ||  checking[1] != toCheck[1])
+                    endLine = true;
+                else if (currentPositionTiles[0] == toCheck[0] && toCheckPosTiles[0] == checking[0]) {
+                    counterConflits++;
+                    //System.out.println("Board: " + tilesToCheck);
+                    //System.out.println("DOWN");
+                    //System.out.println("Conflits between:: " + chekingNumb + " " + toChekNumb);
+                }
+
+            }
         }
 
         return counterConflits;
@@ -496,12 +623,12 @@ public class Board {
         LinkedList<Board> sons = new LinkedList<>();
         Object[] son;
 
-        //System.out.println("Starting board : \n" + strTiles);
+        System.out.println("Starting board : \n" + strTiles);
 
         for(int i = 1; i <= 4; i++) {
             Object[] newSon = makeMove(i);
             if(newSon != null) {
-                //System.out.println("figlio dir: " + i + " - " +  ((String)newSon[0]));
+                System.out.println("figlio dir: " +  ((String)newSon[0]));
                 sons.add( new Board((String)newSon[0], (int)newSon[2], (int)newSon[3], (int)newSon[1], (int)newSon[4]));
             }
             //else 
