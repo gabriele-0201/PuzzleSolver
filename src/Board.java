@@ -424,11 +424,10 @@ public class Board {
                 }
             }
         
-            // check conflits up
+            // check conflits UP
             endLine = false;
             // TODO check if this is correnct, maybe some offset needed
-            indexConflits = index;
-            counter = -1;
+            indexConflits = index - 1;
             
             boolean endColumn = false;
             while(possibleColumnC && !endColumn) {
@@ -436,41 +435,43 @@ public class Board {
                 //TODO fix this to work in this method
                 //serch the number to check
                 // go until find the right value
-                while(index >= 0 && !done) {
+                boolean done = false;
+                int counter = -1;
+                while(indexConflits >= 0 && !done) {
                     if(strTiles.charAt(index) == ' ' ) {
+                        counter++; 
+                        if (counter == Solver.boardSize - 1){
+                            endNumb = indexConflits - 1;
+                        }
+                        else if (counter >= Solver.boardSize) {
+                            done = true;
+                            startNumb = indexConflits + 1;
+                        }
                 
-                         counter++; 
-                
-                         if (counter == Solver.boardSize - 1){
-                             otherIndex = index - 1;
-                         }
-                         else if (counter >= Solver.boardSize) {
-                             done = true;
-                             index += 2;
-                         }
-                
-                     }
-                     index--; 
-                 }
-
+                    }
+                    indexConflits--; 
+                }
+                indexConflits--; 
 
                 //if is finishd the columns END THE LINE
+                if(!done && (counter == Solver.boardSize - 1)) {
+                    startNumb = indexConflits + 2;
+                } else if(!done) {
+                    System.out.println("finished column");
+                    endColumn = true;
+                    continue;
+                }
+
                 
-                
+                System.out.println("Start Number" + startNumb);
+                System.out.println("End Number" + endNumb);
                 
                 //remember to check the position of the column and the value we are cheking
                 //check if there is a conflit between the numbers
 
             }
-
-                 //TODO pay attenction to this, maybe usefull
-                 if(!done && counter == Solver.boardSize - 1) {
-                     done = true;
-                     index++;
-                 } else if(!done) 
-                     return null;
                 
-                 // cech conflits down 
+                // cech conflits down 
         }
 
         return counterConflits;
