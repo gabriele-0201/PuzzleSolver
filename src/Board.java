@@ -7,17 +7,14 @@ public class Board {
     //private StringBuilder bTiles;
     private String strTiles;
     private int zeroPos;
-    //private int zeroIndex;
     private int prevMoved;
     private int manDist;
     private int linConflit;
 
     private double[] ctiles; //compressed tiles
 
-    public static int N; //number of bit for any number, this is also the offset for each mask
-    public static int M; //number of value for each double
-
-
+    public static int B; //number of bit for any number, this is also the offset for each mask
+    public static int N; //number of value for each double
 
     //constructor for the first matrix
     public Board(int[][] tiles) {
@@ -57,6 +54,11 @@ public class Board {
 
     //MAYBE I can work only with position, the change value and oll other things
     private int getVal(int r, int c) {
+        
+        int pos = getPos;
+
+        int mask = Math.pow(2, B);
+
 
 
         return 0; 
@@ -70,7 +72,10 @@ public class Board {
 
     private int getPos(int r, int c) {
 
-        return 0;
+        int pos = r * Solver.boardSize;
+        pos += c;
+        return pos
+
     }
 
     private void compress(int[][] tiles) {
