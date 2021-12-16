@@ -3,19 +3,31 @@ import java.lang.Math;
 
 public class Board {
     
-    private int[][] tiles;
-    private StringBuilder bTiles;
+    //private int[][] tiles;
+    //private StringBuilder bTiles;
     private String strTiles;
     private int zeroPos;
-    private int zeroIndex;
+    //private int zeroIndex;
     private int prevMoved;
     private int manDist;
     private int linConflit;
 
+    private double[] ctiles; //compressed tiles
+
+    public static int N; //number of bit for any number, this is also the offset for each mask
+    public static int M; //number of value for each double
+
+
+
     //constructor for the first matrix
     public Board(int[][] tiles) {
-        this.tiles = tiles;
-        strTiles = toStrFromMatrix();
+        //this.tiles = tiles;
+        
+        N = Math.floor(log2(Solver.boardSize));
+        M = Math.floor(64 / N); 
+        
+        ctiles = compress(tiles); //also create the string
+        //strTiles = toStrFromMatrix(tiles);
         findZero();
         manDist = manhattan();
         linConflit = initialLibearConflicts();
@@ -41,6 +53,40 @@ public class Board {
 
     public int getLinConflit() {
         return linConflit;
+    }
+
+    //MAYBE I can work only with position, the change value and oll other things
+    private int getVal(int r, int c) {
+
+
+        return 0; 
+    }
+
+    private void setVal(int r, int c, int val) {
+
+
+        return 0; 
+    }
+
+    private int getPos(int r, int c) {
+
+        return 0;
+    }
+
+    private void compress(int[][] tiles) {
+        StringBuilder str = new StringBuilder();
+        int counterPosition = 1;
+        for (int i = 0; i < Solver.boardSize; i++) {
+            for (int j = 0; j < Solver.boardSize; j++) {
+                setVal(counterPosition, tiles[i][j]);
+                str.append();
+            }
+        }
+    }
+
+    private int log2(int N){
+        int result = (int)(Math.log(N) / Math.log(2));
+        return result;
     }
 
     public int manhattan() {
@@ -71,6 +117,7 @@ public class Board {
         rightPos[1] = (v - (rightPos[0] * Solver.boardSize)) - 1;
         return rightPos;
     }
+
 
     //dir: 1 - up, 2 - right, 3 - down, 4 - left
     private Object[] makeMove(int dir) {
@@ -517,11 +564,6 @@ public class Board {
         return counterConflits;
     }
 
-    private int linearConflicts(String b) {
-        //Have to check all the line of the initiial 
-        return 0;
-    }
-
         // work with all sons 
         // 1 place : str of son
         // 2 palce : int of the previuos moved number
@@ -563,31 +605,8 @@ public class Board {
         return bTiles.toString();
     }
 
-    private void findZero() {
-        int counter = 1; 
-        for(int i = 0; i < strTiles.length(); i++) {
-
-            if(strTiles.charAt(i) == ' ')
-                counter++;
-            else if(strTiles.charAt(i) == '0') {
-                
-                //this could be done better
-                //chek before is at the start
-                if(i - 1 < 0) {
-                        zeroPos = counter;
-                        zeroIndex = i;
-                } else if(strTiles.charAt(i - 1) == ' ') {
-                    
-                    if(i + 1 >= strTiles.length()) {
-                        zeroPos = counter;
-                        zeroIndex = i;
-                    } else if(strTiles.charAt(i + 1) == ' ') {
-                        zeroPos = counter;
-                        zeroIndex = i;
-                    }
-                } 
-            }
-        }
+    private void findZero(int[] tiles) {
+        for(int i = 0; i < ti) 
     }
 
     @Override
