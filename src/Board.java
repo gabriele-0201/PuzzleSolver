@@ -11,7 +11,7 @@ public class Board {
     private int manDist;
     private int linConflit;
 
-    private double[] ctiles; //compressed tiles
+    private long[] ctiles; //compressed tiles
 
     public static int B; //number of bit for any number, this is also the offset for each mask
     public static int N; //number of value for each double
@@ -20,7 +20,7 @@ public class Board {
     public Board(int[][] tiles) {
         //this.tiles = tiles;
         
-        N = Math.floor(log2(Solver.boardSize));
+        N = Math.ceil(log2(Solver.boardSize));
         M = Math.floor(64 / N); 
         
         ctiles = compress(tiles); //also create the string
@@ -52,39 +52,56 @@ public class Board {
         return linConflit;
     }
 
+    //TO SELECT THE INDEX and the position for each array
+    //
+    //The output of the division (pos / N) is the index of the array of long
+    //
+    //after the position in the the array is (pos % N)
+
     //MAYBE I can work only with position, the change value and oll other things
     private int getVal(int r, int c) {
         
-        int pos = getPos;
+        int pos = getPos(r, c);
+        int index = pos / N;
+        pos = pos % N; // this return the new position in the right array
 
-        int mask = Math.pow(2, B);
+        //int mask = (Math.pow(2, B + 1) - 1) * Math.pow(2, pos * B); //mask to extract the number
+        int mask = getPos(pos);
 
-
-
-        return 0; 
+        return Math.floor((mask & ctiles[index]) / Math.pow(2, pos * B));
     }
 
     private void setVal(int r, int c, int val) {
 
+        int pos = getPos(r, c);
+        int index = pos / N;
+        pos = pos % N; // this return the new position in the right array
 
-        return 0; 
+        //int mask = (Math.pow(2, B + 1) - 1) * Math.pow(2, pos * B); //mask to extract the number
+        int mask = getPos(pos);
+
+        ctiles[index] = (!(mask & ctiles[index])) & ctiles[index] ; //remove the value in the specified pos
+
+        ctiles[index] = ctiles[index] & (val * Mat.pow(pos * B)); //insert the val in the right place
+    }
+
+    private int getMask(int pos) {
+        return (Math.pow(2, B + 1) - 1) * Math.pow(2, pos * B);
     }
 
     private int getPos(int r, int c) {
-
         int pos = r * Solver.boardSize;
         pos += c;
         return pos
-
     }
 
     private void compress(int[][] tiles) {
-        StringBuilder str = new StringBuilder();
+        //StringBuilder str = new StringBuilder();
         int counterPosition = 1;
         for (int i = 0; i < Solver.boardSize; i++) {
             for (int j = 0; j < Solver.boardSize; j++) {
-                setVal(counterPosition, tiles[i][j]);
-                str.append();
+                setVal(i, j, tiles[i][j]);
+                //str.append(tiles[i][j]);
             }
         }
     }
