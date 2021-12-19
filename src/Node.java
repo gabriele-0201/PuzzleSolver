@@ -1,4 +1,5 @@
 import java.util.LinkedList;
+import java.util.Arrays;
 
 public class Node implements Comparable<Node>{
 
@@ -12,6 +13,7 @@ public class Node implements Comparable<Node>{
         this.previous = previous;
         this.moves = moves;
         this.score = this.board.getManDist() + board.getLinConflit() + this.moves;
+        //this.score = this.board.getManDist() + this.moves;
     }
     
     //this constructuor is only called from inside so it could be private
@@ -20,6 +22,7 @@ public class Node implements Comparable<Node>{
         this.previous = previous;
         this.moves = moves;
         this.score = this.board.getManDist() + board.getLinConflit() + this.moves;
+        //this.score = this.board.getManDist() + this.moves;
     }
 
     public Node getPrevious() {
@@ -39,7 +42,7 @@ public class Node implements Comparable<Node>{
     }
 
     public boolean checkEnd() {
-        return (Solver.endBoard).equals(this.board.toString());
+        return Arrays.equals(Board.endBoard, this.board.getCTiles());
     }
 
     @Override
@@ -64,7 +67,7 @@ public class Node implements Comparable<Node>{
 
         for(int i = 0; i < moves.size(); i++) {
             sons.add(new Node(moves.get(i), this, sonsMoves));
-            //System.out.println("Son: " + moves.get(i) + " manhattan: " + moves.get(i).getManDist());
+            //System.out.println("Son: " + moves.get(i) + " manhattan: " + (moves.get(i).getManDist() + moves.get(i).getLinConflit() + sonsMoves));
         }
 
         return sons;

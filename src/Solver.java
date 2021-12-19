@@ -7,10 +7,13 @@ import java.util.PriorityQueue;
 
 public class Solver {
 
-    public static String endBoard;
+    //public static long[] endBoard;
     public static int boardSize;
 
     public static void main(String[] args) {
+
+        //Scanner in = new Scanner(System.in);
+        //in.nextInt();
 
         String fileName = null;
 
@@ -33,7 +36,7 @@ public class Solver {
             System.out.println("File Not Found!");
         }
 
-        setEndBoard();
+        //setEndBoard();
 
         boolean endFound = false;
 
@@ -103,16 +106,5 @@ public class Solver {
         while(!strBoards.isEmpty()) {
             System.out.println(strBoards.removeLast());
         }
-    }
-
-    private static void setEndBoard() {
-        int n = boardSize * boardSize;
-        StringBuilder e  = new StringBuilder();
-        for(int i = 1; i < n; i++) {
-            e.append(i);
-            e.append(" ");
-        }
-        e.append("0");
-        endBoard = e.toString(); 
     }
 }
