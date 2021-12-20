@@ -39,7 +39,6 @@ public class Board {
         zeroPos = new int[2];
         compress(tiles); // also check the zeroPos
 
-        //TODO those are NOT two different value
         manDist = manhattan(tiles) + initialLibearConflicts();
         
         //set EndBoard
@@ -295,8 +294,8 @@ public class Board {
                break;
            case 2:
            case 3:
-               newConflits -= linConflitColumn(newZeroPos[0], moved, null);
-               newConflits += linConflitColumn(zeroPos[0], moved, newctiles);
+               newConflits -= linConflitColumn(newZeroPos[1], moved, null);
+               newConflits += linConflitColumn(zeroPos[1], moved, newctiles);
                break;
         }
 
@@ -325,61 +324,6 @@ public class Board {
             counterConflits += linConflitColumn(i, -1, null);
             counterConflits += linConflitRow(i, -1, null);
         }
-        //the values has to be in the column they have to be
-
-        //first scann all the number in the board
-        //System.out.println(getString());
-        /*
-        for(int i = 0; i < Solver.boardSize; i++) {
-            for(int j = 0; j < Solver.boardSize; j ++) {
-                
-                boolean rightLine = true;
-                boolean rightColumn = true;
-                //for each value have to check all the value on the right and down
-                int[] currentValRightPos = getRightPos(getVal(i, j));
-                if(currentValRightPos[0] != i)
-                    rightLine = false;
-                if(currentValRightPos[1] != j)
-                    rightColumn = false;
-
-                //System.out.println("current val" + getVal(i, j));
-
-                if(rightLine)
-                    for(int c = 1; c < Solver.boardSize - j; c++) {
-                        //System.out.println("LINE checking val" + getVal(i, j + c));
-                        int[] otherValRightPos = getRightPos(getVal(i, j + c));
-
-                        if(otherValRightPos[0] != i)
-                            continue;
-
-                        //if(j == otherValRightPos[1]  && (j + c) == currentValRightPos[1]){
-                        if(otherValRightPos[1] <= currentValRightPos[1]){
-                            counterConflits+=2;
-                            //System.out.println("Conflits: " + getVal(i, j) + "  -  " + getVal(i, j + c));
-                        }
-
-                    }
-
-                if(rightColumn)
-                    for(int c = 1; c < Solver.boardSize - i; c++) {
-                        //System.out.println("COLUMN checking val" + getVal(i + c, j));
-                        int[] otherValRightPos = getRightPos(getVal(i + c, j));
-
-                        if(otherValRightPos[1] != j)
-                            continue;
-
-                        //if(i == otherValRightPos[0]  && (i + c) == currentValRightPos[0]) {
-                        if(otherValRightPos[0] <= currentValRightPos[0]){
-                            counterConflits+=2;
-                            //System.out.println("Conflits: " + getVal(i, j) + "  -  " + getVal(i + c, j));
-                        }
-
-                    }
-
-
-            }
-        }
-        */
 
         return counterConflits;
     }
@@ -394,7 +338,7 @@ public class Board {
             boolean rightColumn = true;
             //for each value have to check all the value on the right and down
             int[] currentValRightPos = getRightPos(getVal(j, column, board));
-            if(currentValRightPos[1] != column)
+            if(currentValRightPos[1] != column || (currentValRightPos[0] == j && currentValRightPos[1] == column))
                 rightColumn = false;
 
             //System.out.println("current val" + getVal(j, column, board));
@@ -409,9 +353,8 @@ public class Board {
 
                     if(otherValRightPos[0] <= currentValRightPos[0]){
                         counter+=2;
-                        //System.out.println("Board: " + getString());
+                        //System.out.println("Board: " + getString(board));
                         //System.out.println("Conflits: " + getVal(j, column, board) + "  -  " + getVal(j + c, column, board));
-                        //System.out.println("" + currentValRightPos[1]);
                     }
 
                 }
@@ -430,7 +373,7 @@ public class Board {
             //for each value have to check all the value on the right and down
             int[] currentValRightPos = getRightPos(getVal(row, j, board));
 
-            if(currentValRightPos[0] != row)
+            if(currentValRightPos[0] != row || (currentValRightPos[0] == row && currentValRightPos[1] == j))
                 rightLine = false;
 
             //System.out.println("current val" + getVal(i, j, baord));
@@ -444,7 +387,7 @@ public class Board {
 
                     if(otherValRightPos[1] <= currentValRightPos[1]){
                         counter+=2;
-                        //System.out.println("Board: " + getString());
+                        //System.out.println("Board: " + getString(board));
                         //System.out.println("Conflits: " + getVal(row, j, board) + "  -  " + getVal(row, j + c, board));
                     }
 
