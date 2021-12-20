@@ -12,7 +12,8 @@ public class Node implements Comparable<Node>{
         this.board = new Board(getTiles(strBoard));
         this.previous = previous;
         this.moves = moves;
-        this.score = this.board.getManDist() + this.moves;
+        this.score = this.board.getManDist() + this.board.getLinConflit() + this.moves;
+        //this.score = this.board.getManDist() + this.moves;
     }
     
     //this constructuor is only called from inside so it could be private
@@ -20,7 +21,8 @@ public class Node implements Comparable<Node>{
         this.board = board;
         this.previous = previous;
         this.moves = moves;
-        this.score = this.board.getManDist() + this.moves;
+        this.score = this.board.getManDist() + this.board.getLinConflit() + this.moves;
+        //this.score = this.board.getManDist() + this.moves;
     }
 
     public Node getPrevious() {
@@ -40,7 +42,8 @@ public class Node implements Comparable<Node>{
     }
 
     public boolean checkEnd() {
-        return Arrays.equals(Board.endBoard, this.board.getCTiles());
+        return this.board.getManDist() == 0;
+        //return Arrays.equals(Board.endBoard, this.board.getCTiles());
     }
 
     @Override
