@@ -4,19 +4,18 @@ import java.lang.Math;
 
 public class Board {
     
+    public static int B; //number of bit for any number, this is also the offset for each mask
+    public static int N; //number of value for each double
+    
+    public static long[] endBoard;
+    
     //QUANDO necessito delle stirnghe? da subito??
     //private String strTiles;
     private int[] zeroPos;
     private int prevMoved;
     private int manDist;
-    private int linConflit;
 
     private long[] ctiles; //compressed tiles
-
-    public static int B; //number of bit for any number, this is also the offset for each mask
-    public static int N; //number of value for each double
-    
-    public static long[] endBoard;
 
     //constructor for the first matrix
     public Board(int[][] tiles) {
@@ -40,10 +39,9 @@ public class Board {
         zeroPos = new int[2];
         compress(tiles); // also check the zeroPos
 
-        //findZero();
-        manDist = manhattan(tiles);
-        linConflit = initialLibearConflicts();
-        //
+        //TODO those are NOT two different value
+        manDist = manhattan(tiles) + initialLibearConflicts();
+        
         //set EndBoard
         endBoard = new long[dim];
         int c = 1;
@@ -51,9 +49,9 @@ public class Board {
         for(int i=0; i < Solver.boardSize; i++)
             for(int j=0; j < Solver.boardSize; j++)
                 if(c == max)
-                    setVal(endBoard, i, j, 0);
+                    setVal(i, j, 0, endBoard);
                 else
-                    setVal(endBoard, i, j, c++);
+                    setVal(i, j, c++, endBoard);
     }
 
     //What need the constructor?
@@ -62,7 +60,7 @@ public class Board {
         this.zeroPos = zeroPos;
         this.prevMoved = prevMoved;            
         this.manDist = manDist;
-        linConflit = initialLibearConflicts();
+        //linConflit = linearConflits(dirPrevMov);
     }
 
     public int getPrevMoved() {
@@ -73,15 +71,13 @@ public class Board {
         return manDist;
     }
 
-    public int getLinConflit() {
-        return linConflit;
-    }
-
     public long[] getCTiles() {
         return ctiles;
     }
 
-    private int getVal(int r, int c) {
+    private int getVal(int r, int c, long[] newCTiles) {
+
+        long[] board = newCTiles != null ? newCTiles : ctiles;
 
         int pos = getPos(r, c);
         if(pos == -1)
@@ -93,9 +89,10 @@ public class Board {
         long mask = getMask(pos);
 
         //return (int)((long)Math.floor((mask & ctiles[index])) >> (pos * B));
-        return (int)((mask & ctiles[index]) >> (pos * B));
+        return (int)((mask & board[index]) >> (pos * B));
     }
     
+    /*
     private void setVal(int r, int c, long val) {
 
         int pos = getPos(r, c);
@@ -126,8 +123,11 @@ public class Board {
         //printBit(ctiles[index]);
         //System.out.println();
     }
+    */
     
-    private void setVal(long[] comp, int r, int c, long val) {
+    private void setVal(int r, int c, long val, long[] newCTiles) {
+
+        long[] board = newCTiles != null ? newCTiles : ctiles;
 
         int pos = getPos(r, c);
         if(pos == -1)
@@ -137,11 +137,11 @@ public class Board {
         pos = pos % N; // this return the new position in the right array
         long mask = getMask(pos);
 
-        comp[index] = (~(mask & comp[index])) & comp[index] ; //remove the value in the specified pos
+        board[index] = (~(mask & board[index])) & board[index] ; //remove the value in the specified pos
 
         val = val << (pos * B);
 
-        comp[index] = (comp[index]) | (val); //insert the val in the right place
+        board[index] = (board[index]) | (val); //insert the val in the right place
     }
 
     private long getMask(int pos) {
@@ -152,6 +152,7 @@ public class Board {
         return mask1Bit << (pos * B);
     }
      
+    /*
     private void printBit(long v) {
         for(int i = 63; i >=0; i--)
             if((v & ((long)1 << i)) != 0)
@@ -159,6 +160,7 @@ public class Board {
             else
                 System.out.print("0");
     }
+    */
 
     private int getPos(int r, int c) {
         
@@ -175,7 +177,7 @@ public class Board {
         //StringBuilder str = new StringBuilder();
         for (int i = 0; i < Solver.boardSize; i++) {
             for (int j = 0; j < Solver.boardSize; j++) {
-                setVal(i, j, tiles[i][j]);
+                setVal(i, j, tiles[i][j], null);
                 //str.append(tiles[i][j]);
                 if(tiles[i][j] == 0) {
                     zeroPos[0] = i;
@@ -218,45 +220,27 @@ public class Board {
         return rightPos;
     }
 
-    //minus 1
-    private int[] getRightPosM1(int v) {
-
-        //if(v == 0) return new int[] {Solver.boardSize - 1, Solver.boardSize - 1};
-        if(v == 0) return new int[] {-1,-1};
-
-        int[] rightPos = new int[2];
-        rightPos[0]= (v - 1) / Solver.boardSize;
-        rightPos[1] = (v - (rightPos[0] * Solver.boardSize)) - 1;
-        rightPos[0] -= 1;
-        rightPos[1] -= 1;
-        return rightPos;
-    }
-
     //dir: 1 - up, 2 - right, 3 - down, 4 - left
     private Object[] makeMove(int dir) {
-        //System.out.println("Direction: " + dir);
         Object[] son = null;
 
         int moved = -1;
         int[] newZeroPos = new int[2];
         boolean done = false;
         
-        //System.out.println("Zero index: " + index);
-        //System.out.println("Zero Position: " + zeroPos);
-        //System.out.println("right index" + getRightIndex());
 
         switch(dir) {
             case 1: //up
-                moved = getVal(zeroPos[0] - 1, zeroPos[1]);
+                moved = getVal(zeroPos[0] - 1, zeroPos[1], null);
                 break;
             case 3: //down
-                moved = getVal(zeroPos[0] + 1, zeroPos[1]);
+                moved = getVal(zeroPos[0] + 1, zeroPos[1], null);
                 break;
             case 2: //right
-                moved = getVal(zeroPos[0], zeroPos[1] + 1);
+                moved = getVal(zeroPos[0], zeroPos[1] + 1, null);
                 break;
             case 4: //left
-                moved = getVal(zeroPos[0], zeroPos[1] - 1);
+                moved = getVal(zeroPos[0], zeroPos[1] - 1, null);
                 break;
         }
 
@@ -270,9 +254,10 @@ public class Board {
         // work with all sons 
         // 1 place : ctiles of son
         // 2 place : new zero position of the son
-        // 3 palce : int of the previuos moved number
-        // 4 palce : new manhattan
+        // 3 place : int of the previuos moved number
+        // 4 place : new manhattan
 
+        //update the conglits
        switch (dir) {
            case 1:
                newZeroPos[0] = zeroPos[0] - 1;
@@ -292,24 +277,42 @@ public class Board {
                break;
        }
 
-       setVal(newctiles, newZeroPos[0], newZeroPos[1], 0);
-       setVal(newctiles, zeroPos[0], zeroPos[1], moved);
+       setVal(newZeroPos[0], newZeroPos[1], 0, newctiles);
+       setVal(zeroPos[0], zeroPos[1], moved, newctiles);
 
        son = new Object[4];
        son[0] = newctiles;
        son[1] = newZeroPos;
        son[2] = moved;
 
-       // How Can I calculate the new Manhattan?
+       //update new manhattan with the conflits
+        int newConflits = 0;
+        switch (dir) {
+           case 1:
+           case 4:
+               newConflits -= linConflitRow(newZeroPos[0], moved, null);
+               newConflits += linConflitRow(zeroPos[0], moved, newctiles);
+               break;
+           case 2:
+           case 3:
+               newConflits -= linConflitColumn(newZeroPos[0], moved, null);
+               newConflits += linConflitColumn(zeroPos[0], moved, newctiles);
+               break;
+        }
+
+        //System.out.println("Padre: " + getString());
+        //System.out.println("Figlio: " + getString(newctiles));
+        //System.out.println("nuovi conflitti: " + newConflits);
+        
 
        int[] rightPos = getRightPos(moved);
        
        if(Math.abs(newZeroPos[0] - rightPos[0]) < Math.abs(zeroPos[0] - rightPos[0])) {
-            son[3] = manDist + 1;
+            son[3] = manDist + 1 + newConflits;
        } else if(Math.abs(newZeroPos[1] - rightPos[1]) < Math.abs(zeroPos[1] - rightPos[1])) {
-            son[3] = manDist + 1;
+            son[3] = manDist + 1 + newConflits;
        } else {
-            son[3] = manDist - 1;
+            son[3] = manDist - 1 + newConflits;
        }
 
         return son;
@@ -318,13 +321,18 @@ public class Board {
     private int initialLibearConflicts() {
         int counterConflits = 0;
 
+        for(int i = 0; i < Solver.boardSize; i++) {
+            counterConflits += linConflitColumn(i, -1, null);
+            counterConflits += linConflitRow(i, -1, null);
+        }
         //the values has to be in the column they have to be
 
         //first scann all the number in the board
         //System.out.println(getString());
+        /*
         for(int i = 0; i < Solver.boardSize; i++) {
             for(int j = 0; j < Solver.boardSize; j ++) {
-
+                
                 boolean rightLine = true;
                 boolean rightColumn = true;
                 //for each value have to check all the value on the right and down
@@ -371,8 +379,78 @@ public class Board {
 
             }
         }
+        */
 
         return counterConflits;
+    }
+
+    private int linConflitColumn(int column, int valToCheck, long[] newCTiles) {
+
+        long[] board = newCTiles != null ? newCTiles : ctiles;
+
+        int counter = 0;
+        for(int j = 0; j < Solver.boardSize; j ++) {
+
+            boolean rightColumn = true;
+            //for each value have to check all the value on the right and down
+            int[] currentValRightPos = getRightPos(getVal(j, column, board));
+            if(currentValRightPos[1] != column)
+                rightColumn = false;
+
+            //System.out.println("current val" + getVal(j, column, board));
+            if(rightColumn)
+                for(int c = 1; c < Solver.boardSize - j; c++) {
+                    //System.out.println("COLUMN checking val" + getVal(j + c, column, board));
+                    int[] otherValRightPos = getRightPos(getVal(j + c, column, board));
+
+                    if(otherValRightPos[1] != column || (valToCheck != -1 && !(getVal(j + c, column, board) ==  valToCheck || getVal(j, column, board) ==  valToCheck)))
+                        continue;
+                    //if(otherValRightPos[1] != column || (valToCheck != -1 && getVal(j + c, column, board) !=  valToCheck &&  getVal(j, column, board) !=  valToCheck))
+
+                    if(otherValRightPos[0] <= currentValRightPos[0]){
+                        counter+=2;
+                        //System.out.println("Board: " + getString());
+                        //System.out.println("Conflits: " + getVal(j, column, board) + "  -  " + getVal(j + c, column, board));
+                        //System.out.println("" + currentValRightPos[1]);
+                    }
+
+                }
+        }
+        return counter;
+    }
+    
+    private int linConflitRow(int row, int valToCheck, long[] newCTiles) {
+
+        long[] board = newCTiles != null ? newCTiles : ctiles;
+
+        int counter = 0;
+        for(int j = 0; j < Solver.boardSize; j ++) {
+
+            boolean rightLine = true;
+            //for each value have to check all the value on the right and down
+            int[] currentValRightPos = getRightPos(getVal(row, j, board));
+
+            if(currentValRightPos[0] != row)
+                rightLine = false;
+
+            //System.out.println("current val" + getVal(i, j, baord));
+            if(rightLine)
+                for(int c = 1; c < Solver.boardSize - j; c++) {
+                    //System.out.println("LINE checking val" + getVal(row, j + c, baord));
+                    int[] otherValRightPos = getRightPos(getVal(row, j + c, board));
+
+                    if(otherValRightPos[0] != row || (valToCheck != -1 && !(getVal(row, j + c, board) ==  valToCheck || getVal(row, j, board) ==  valToCheck)))
+                        continue;
+
+                    if(otherValRightPos[1] <= currentValRightPos[1]){
+                        counter+=2;
+                        //System.out.println("Board: " + getString());
+                        //System.out.println("Conflits: " + getVal(row, j, board) + "  -  " + getVal(row, j + c, board));
+                    }
+
+                }
+        }
+        return counter;
     }
 
     public LinkedList<Board> getMoves() {
@@ -400,7 +478,18 @@ public class Board {
         StringBuilder bTiles = new StringBuilder();
         for(int i = 0; i < Solver.boardSize; i++) {
             for(int j = 0; j < Solver.boardSize; j++) {
-                bTiles.append(getVal(i, j) + " ");
+                bTiles.append(getVal(i, j, null) + " ");
+            }
+        }
+        bTiles.deleteCharAt(bTiles.length() - 1);
+        return bTiles.toString();
+    }
+
+    private String getString(long[] c) {
+        StringBuilder bTiles = new StringBuilder();
+        for(int i = 0; i < Solver.boardSize; i++) {
+            for(int j = 0; j < Solver.boardSize; j++) {
+                bTiles.append(getVal(i, j, c) + " ");
             }
         }
         bTiles.deleteCharAt(bTiles.length() - 1);
