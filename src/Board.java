@@ -4,9 +4,11 @@ import java.lang.Math;
 
 public class Board {
     
-    public static int B; //number of bit for any number, this is also the offset for each mask
-    public static int N; //number of value for each double
+    private static int B; //number of bit for any number, this is also the offset for each mask
+    private static int N; //number of value for each double
     
+    private static long mask1Bit;
+
     private int[] zeroPos;
     private int prevMoved;
     private int manDist;
@@ -27,6 +29,7 @@ public class Board {
         }
 
         ctiles = new long[dim];
+        mask1Bit = (long)Math.pow(2, B) - 1;
         zeroPos = new int[2];
         compress(tiles); // also check the zeroPos
 
@@ -42,10 +45,6 @@ public class Board {
         this.linConflit = linConflit; 
     }
 
-    public int getPrevMoved() {
-        return prevMoved;
-    }
-    
     public int getManDist() {
         return manDist;
     }
@@ -69,10 +68,7 @@ public class Board {
         int index = pos / N;
         pos = pos % N; // this return the new position in the right array
 
-        long mask = getMask(pos);
-
-        //return (int)((long)Math.floor((mask & ctiles[index])) >> (pos * B));
-        return (int)((mask & board[index]) >> (pos * B));
+        return (int)((getMask(pos) & board[index]) >> (pos * B));
     }
     
     private void setVal(int r, int c, long val, long[] newCTiles) {
@@ -85,9 +81,8 @@ public class Board {
 
         int index = pos / N;
         pos = pos % N; // this return the new position in the right array
-        long mask = getMask(pos);
 
-        board[index] = (~(mask & board[index])) & board[index] ; //remove the value in the specified pos
+        board[index] = (~(getMask(pos) & board[index])) & board[index] ; //remove the value in the specified pos
 
         val = val << (pos * B);
 
@@ -95,7 +90,6 @@ public class Board {
     }
 
     private long getMask(int pos) {
-        long mask1Bit = (long)Math.pow(2, B) - 1;
         return mask1Bit << (pos * B);
     }
 
@@ -105,9 +99,9 @@ public class Board {
         if(r < 0 || r >= Solver.boardSize || c < 0 || c >= Solver.boardSize)
             return -1;
 
-        int pos = r * Solver.boardSize;
-        pos += c;
-        return pos;
+        //int pos = r * Solver.boardSize;
+        //pos += c;
+        return (r * Solver.boardSize) + c;
     }
 
     private void compress(int[][] tiles) {
@@ -156,7 +150,6 @@ public class Board {
 
     //dir: 1 - up, 2 - right, 3 - down, 4 - left
     private Object[] makeMove(int dir) {
-        Object[] son = null;
 
         int moved = -1;
         int[] newZeroPos = new int[2];
@@ -213,7 +206,7 @@ public class Board {
        setVal(newZeroPos[0], newZeroPos[1], 0, newctiles);
        setVal(zeroPos[0], zeroPos[1], moved, newctiles);
 
-       son = new Object[5];
+       Object[] son = new Object[5];
        son[0] = newctiles;
        son[1] = newZeroPos;
        son[2] = moved;
@@ -234,7 +227,6 @@ public class Board {
         }
         
        int[] rightPos = getRightPos(moved);
-       
        if(Math.abs(newZeroPos[0] - rightPos[0]) < Math.abs(zeroPos[0] - rightPos[0])) {
             son[3] = manDist + 1;
        } else if(Math.abs(newZeroPos[1] - rightPos[1]) < Math.abs(zeroPos[1] - rightPos[1])) {
@@ -264,17 +256,19 @@ public class Board {
         long[] board = newCTiles != null ? newCTiles : ctiles;
 
         int counter = 0;
+        int checkNumb, toCheckNumbWith;
+        int[] currentValRightPos, otherValRightPos;
         for(int j = 0; j < Solver.boardSize - 1; j ++) {
 
             //for each value have to check all the value on the right and down
-            int checkNumb = getVal(j, column, board);
-            int[] currentValRightPos = getRightPos(checkNumb);
+            checkNumb = getVal(j, column, board);
+            currentValRightPos = getRightPos(checkNumb);
             if(currentValRightPos[1] != column)
                 continue;
 
             for(int c = 1; c < Solver.boardSize - j; c++) {
-                int toCheckNumbWith = getVal(j + c, column, board);
-                int[] otherValRightPos = getRightPos(toCheckNumbWith);
+                toCheckNumbWith = getVal(j + c, column, board);
+                otherValRightPos = getRightPos(toCheckNumbWith);
 
                 if(otherValRightPos[1] != column ||
                     (valToCheck != -1 &&
