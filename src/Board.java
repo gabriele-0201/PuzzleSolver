@@ -7,8 +7,6 @@ public class Board {
     public static int B; //number of bit for any number, this is also the offset for each mask
     public static int N; //number of value for each double
     
-    //QUANDO necessito delle stirnghe? da subito??
-    //private String strTiles;
     private int[] zeroPos;
     private int prevMoved;
     private int manDist;
@@ -16,23 +14,17 @@ public class Board {
 
     private long[] ctiles; //compressed tiles
 
-    //constructor for the first matrix
     public Board(int[][] tiles) {
         
         B = (int)Math.ceil(log2((Solver.boardSize * Solver.boardSize) + 1));
-        //System.out.println("Bit per numnero " + B);
         N = (int)Math.floor(64 / B); 
-        //System.out.println("Niumero di val possibili per long " + N);
         
-        //Maybe not work
         int totalNum = (Solver.boardSize * Solver.boardSize);
         int dim = 1;
         while(totalNum > 0 && totalNum > N) {
             totalNum -= N;
             dim++;
         }
-
-        //System.out.println("Dimensione dell'array " + dim);
 
         ctiles = new long[dim];
         zeroPos = new int[2];
@@ -42,7 +34,6 @@ public class Board {
         linConflit = initialLibearConflicts();
     }
 
-    //What need the constructor?
     private Board(long[] ctiles, int[] zeroPos, int prevMoved, int manDist, int linConflit) {
         this.ctiles = ctiles;
         this.zeroPos = zeroPos;
@@ -120,11 +111,9 @@ public class Board {
     }
 
     private void compress(int[][] tiles) {
-        //StringBuilder str = new StringBuilder();
         for (int i = 0; i < Solver.boardSize; i++) {
             for (int j = 0; j < Solver.boardSize; j++) {
                 setVal(i, j, tiles[i][j], null);
-                //str.append(tiles[i][j]);
                 if(tiles[i][j] == 0) {
                     zeroPos[0] = i;
                     zeroPos[1] = j;
@@ -157,7 +146,6 @@ public class Board {
     
     private int[] getRightPos(int v) {
 
-        //if(v == 0) return new int[] {Solver.boardSize - 1, Solver.boardSize - 1};
         if(v == 0) return new int[] {-1,-1};
 
         int[] rightPos = new int[2];
@@ -235,36 +223,16 @@ public class Board {
         switch (dir) {
            case 1:
            case 3:
-                
-               //System.out.println("Padre: " + getString());
-               //System.out.println("Figlio: " + getString(newctiles));
-               //System.out.println("Conflitti da rimuovere: ");
                newConflits -= linConflitRowVal(newZeroPos[0], newZeroPos[1], moved, ctiles);
-               //System.out.println("Conflitti da aggiungere: ");
                newConflits += linConflitRowVal(zeroPos[0], zeroPos[1], moved, newctiles);
-
                break;
            case 2:
            case 4:
-
-               //System.out.println("Padre: " + getString());
-               //System.out.println("Figlio: " + getString(newctiles));
-               //System.out.println("Conflitti da rimuovere: ");
                newConflits -= linConflitColumnVal(newZeroPos[0], newZeroPos[1], moved, ctiles);
-               //System.out.println("Conflitti da aggiungere: ");
                newConflits += linConflitColumnVal(zeroPos[0], zeroPos[1], moved, newctiles);
-
                break;
         }
-
-        //System.out.println("Padre: " + getString());
-        //System.out.println("Figlio: " + getString(newctiles));
-        //System.out.println(linConflit + " " +  newConflits);
-
-        //if(linConflit + newConflits < 0) 
-        //   System.out.println("FUCK " + linConflit + " " +  newConflits);
-
-
+        
        int[] rightPos = getRightPos(moved);
        
        if(Math.abs(newZeroPos[0] - rightPos[0]) < Math.abs(zeroPos[0] - rightPos[0])) {
@@ -277,31 +245,11 @@ public class Board {
 
         son[4] = linConflit + newConflits;
 
-        //System.out.println("precedente  Manhattan: " + manDist);
-        //System.out.println("Nuovo Manhattan: " + (int)son[3]);
-        //System.out.println("precedente  Conflitti: " + linConflit);
-        //System.out.println("Nuovo Confliti: " + (int)son[4]);
-        
-        /*
-        if((int)son[4] < 0) {
-            System.out.println("Padre: " + getString());
-            System.out.println("Figlio: " + getString(newctiles));
-            System.out.println("cambio conflitti: " + newConflits);
-            System.out.println("precedente  Manhattan: " + manDist);
-            System.out.println("Nuovo Manhattan: " + (int)son[3]);
-            System.out.println("precedente  Conflitti: " + linConflit);
-            System.out.println("Nuovo Confliti: " + (int)son[4]);
-        }
-        */
-        
-
         return son;
     }
 
     private int initialLibearConflicts() {
         int counterConflits = 0;
-
-        //System.out.println("Conflitti INIZIALI: " );
 
         for(int i = 0; i < Solver.boardSize; i++) {
             counterConflits += linConflitColumn(i, -1, null);
@@ -321,25 +269,20 @@ public class Board {
             //for each value have to check all the value on the right and down
             int checkNumb = getVal(j, column, board);
             int[] currentValRightPos = getRightPos(checkNumb);
-            if(currentValRightPos[1] != column /*|| (currentValRightPos[0] == j && currentValRightPos[1] == column)*/)
+            if(currentValRightPos[1] != column)
                 continue;
 
-            //System.out.println("current val" + getVal(j, column, board));
             for(int c = 1; c < Solver.boardSize - j; c++) {
-                //System.out.println("COLUMN checking val" + getVal(j + c, column, board));
                 int toCheckNumbWith = getVal(j + c, column, board);
                 int[] otherValRightPos = getRightPos(toCheckNumbWith);
 
                 if(otherValRightPos[1] != column ||
                     (valToCheck != -1 &&
-                     !(checkNumb ==  valToCheck || toCheckNumbWith ==  valToCheck)) /*||
-                     (otherValRightPos[0] == (j + c) && otherValRightPos[1] == column)*/)
+                     !(checkNumb ==  valToCheck || toCheckNumbWith ==  valToCheck)))
                     continue;
 
-                if(otherValRightPos[0] <= currentValRightPos[0] /*&& currentValRightPos[0] >= otherValRightPos[0]*/){
+                if(otherValRightPos[0] <= currentValRightPos[0]){
                     counter+=2;
-                    //System.out.println("Board: " + getString(board));
-                    //System.out.println("column Conflits: " + checkNumb + "  -  " + toCheckNumbWith);
                 }
 
             }
@@ -348,14 +291,11 @@ public class Board {
     }
 
     private int linConflitColumnVal(int row, int column, int valToCheck, long[] newCTiles) {
-    
-        //if(getString(newCTiles).equals("2 8 0 4 5 6 1 7 3"))
-            //System.out.println("cazzo");
 
         int counter = 0;
         int[] realPos = getRightPos(valToCheck);
 
-        if(realPos[1] != column /*|| (realPos[0] == row && realPos[1] == column)*/)
+        if(realPos[1] != column)
             return 0;
 
         for(int j = 0; j < Solver.boardSize; j ++) {
@@ -366,13 +306,13 @@ public class Board {
             //for each value have to check all the value on the right and down
             int checkNumb = getVal(j, column, newCTiles);
             int[] currentValRightPos = getRightPos(checkNumb);
-            if(currentValRightPos[1] != column /*|| (currentValRightPos[0] == j && currentValRightPos[1] == column)*/)
+            if(currentValRightPos[1] != column)
                 continue;
                 
             if (j < row && currentValRightPos[0] >= realPos[0] ) {
                 counter+=2;
             }
-            else if (j > row && currentValRightPos[0] <= realPos[0] /*&& currentValRightPos[0] >= otherValRightPos[0]*/) {
+            else if (j > row && currentValRightPos[0] <= realPos[0]) {
                 counter+=2;
             }
         }
@@ -390,25 +330,21 @@ public class Board {
             int checkNumb = getVal(row, j, board);
             int[] currentValRightPos = getRightPos(checkNumb);
 
-            if(currentValRightPos[0] != row /*|| (currentValRightPos[0] == row && currentValRightPos[1] == j)*/)
+            if(currentValRightPos[0] != row)
                 continue;
             
             //System.out.println("current val" + getVal(i, j, baord));
             for(int c = 1; c < Solver.boardSize - j; c++) {
-                //System.out.println("LINE checking val" + getVal(row, j + c, board));
                 int toCheckNumbWith = getVal(row, j + c, board);
                 int[] otherValRightPos = getRightPos(toCheckNumbWith);
 
                 if(otherValRightPos[0] != row ||
                     (valToCheck != -1 && 
-                     !(checkNumb ==  valToCheck || toCheckNumbWith ==  valToCheck)) /*||
-                     (otherValRightPos[0] == row && otherValRightPos[1] == (j + c))*/)
+                     !(checkNumb ==  valToCheck || toCheckNumbWith ==  valToCheck)))
                     continue;
 
-                if(otherValRightPos[1] <= currentValRightPos[1] /*&& currentValRightPos[1] >= otherValRightPos[1]*/){
+                if(otherValRightPos[1] <= currentValRightPos[1]){
                     counter+=2;
-                    //System.out.println("Board: " + getString(board));
-                    //System.out.println("row Conflits: " + checkNumb + "  -  " + toCheckNumbWith);
                 }
 
             }
@@ -421,7 +357,7 @@ public class Board {
         int counter = 0;
         int[] realPos = getRightPos(valToCheck);
 
-        if(realPos[0] != row /*|| (realPos[0] == row && realPos[1] == column)*/)
+        if(realPos[0] != row)
             return 0;
 
         for(int j = 0; j < Solver.boardSize; j ++) {
@@ -432,16 +368,14 @@ public class Board {
             //for each value have to check all the value on the right and down
             int checkNumb = getVal(row, j, newCTiles);
             int[] currentValRightPos = getRightPos(checkNumb);
-            if(currentValRightPos[0] != row /*|| (currentValRightPos[0] == row && currentValRightPos[1] == j)*/)
+            if(currentValRightPos[0] != row)
                 continue;
 
-            if (j < column && currentValRightPos[1] >= realPos[1] /*&& currentValRightPos[0] >= otherValRightPos[0]*/) {
+            if (j < column && currentValRightPos[1] >= realPos[1]) {
                 counter+=2;
-                //System.out.println("row Conflits: " + valToCheck + "  -  " + checkNumb);
             }
-            else if (j > column && currentValRightPos[1] <= realPos[1] /*&& currentValRightPos[0] >= otherValRightPos[0]*/) {
+            else if (j > column && currentValRightPos[1] <= realPos[1]) {
                 counter+=2;
-                //System.out.println("row Conflits: " + valToCheck + "  -  " + checkNumb);
             }
         }
         return counter;
@@ -453,7 +387,6 @@ public class Board {
         Object[] son;
 
         //System.out.println("Starting board : \n" + strTiles);
-
         for(int i = 1; i <= 4; i++) {
             Object[] newSon = makeMove(i);
             if(newSon != null) {
@@ -497,15 +430,12 @@ public class Board {
 
     @Override
     public boolean equals(Object o) {
-        //return strTiles.equals(((Board)o).toString());
-        //return (bTiles.toString()).equals(((Board)o).toString());
         return Arrays.equals(ctiles, ((Board)o).getCTiles());
     }
 
     @Override
     public int hashCode() {
         return ctiles.hashCode();
-        //return (bTiles.toString()).hashCode();
     }
 
 }
