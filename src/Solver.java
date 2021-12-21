@@ -75,7 +75,7 @@ public class Solver {
 
                         nodeMap.put(s.getBoard(), s);
 
-                        que.remove((Node)tmp);
+                        //que.remove((Node)tmp);
                         que.add(s);
 
                     }
