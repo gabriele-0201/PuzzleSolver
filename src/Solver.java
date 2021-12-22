@@ -7,13 +7,9 @@ import java.util.PriorityQueue;
 
 public class Solver {
 
-    //public static long[] endBoard;
     public static int boardSize;
 
     public static void main(String[] args) {
-
-        //Scanner in = new Scanner(System.in);
-        //in.nextInt();
 
         String fileName = null;
 
@@ -36,11 +32,8 @@ public class Solver {
             System.out.println("File Not Found!");
         }
 
-        //setEndBoard();
-
         boolean endFound = false;
 
-        //Some problem with this, do not know how but the queue is at finally empty WHYY
         HashMap<Board, Node> nodeMap = new HashMap<>();
 
         //Create the first node with zero moves
@@ -49,18 +42,12 @@ public class Solver {
         endFound = node.checkEnd();;
 
         PriorityQueue<Node> que = new PriorityQueue<>();;
-        que.add(node);;
+        que.add(node);
         nodeMap.put(node.getBoard(), node);
         
         int i = 0;
 
         while(!endFound) {
-
-
-            //if((i++) == 3)
-                //break;
-            
-            //System.out.println("Size que: " + que.size());
             
             node = que.poll();
 
@@ -108,4 +95,5 @@ public class Solver {
             System.out.println(strBoards.removeLast());
         }
     }
+
 }

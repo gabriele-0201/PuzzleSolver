@@ -1,5 +1,4 @@
 import java.util.LinkedList;
-import java.util.Arrays;
 
 public class Node implements Comparable<Node>{
 
@@ -43,7 +42,6 @@ public class Node implements Comparable<Node>{
 
     public boolean checkEnd() {
         return this.board.getManDist() == 0;
-        //return Arrays.equals(Board.endBoard, this.board.getCTiles());
     }
 
     @Override
@@ -89,4 +87,5 @@ public class Node implements Comparable<Node>{
         }
         return tiles;
     }
+
 }
