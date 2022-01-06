@@ -47,7 +47,6 @@ public class Solver {
         boolean endFound = false;
 
         HashMap<Board, Node> nodeMap = new HashMap<>();
-        //HashMap<long[], Board> nodeMap = new HashMap<>();
 
         //Create the first node with zero moves
         Node node = new Node(strBoard, null, 0); 
@@ -58,8 +57,6 @@ public class Solver {
         que.add(node);
         nodeMap.put(node.getBoard(), node);
         
-        int i = 0;
-
         while(!endFound) {
             
             node = que.poll();
@@ -74,8 +71,7 @@ public class Solver {
                     if(((Node)tmp).getMoves() > s.getMoves()) {
 
                         nodeMap.put(s.getBoard(), s);
-
-                        //que.remove((Node)tmp);
+                        que.remove((Node)tmp);
                         que.add(s);
 
                     }
@@ -165,7 +161,6 @@ public class Solver {
     
         public boolean checkEnd() {
             return this.board.getManDist() == 0;
-            //return Arrays.equals(Board.endBoard, this.board.getCTiles());
         }
     
         @Override
@@ -180,18 +175,15 @@ public class Solver {
     
         public LinkedList<Node> getSons() {
             LinkedList<Node> sons = new LinkedList<>();
+
             //get a list with all the son of the current board
             LinkedList<Board> moves = board.getMoves();
     
-            //adding one move for the all the son
+            //adding one move for the all the sons
             int sonsMoves = this.moves + 1;
     
-            //System.out.println("Dead: " + board + " manhattan: " + board.getManDist());
-    
-            for(int i = 0; i < moves.size(); i++) {
+            for(int i = 0; i < moves.size(); i++)
                 sons.add(new Node(moves.get(i), this, sonsMoves));
-                //System.out.println("Son: " + moves.get(i) + " manhattan: " + (moves.get(i).getManDist() + moves.get(i).getLinConflit() + sonsMoves));
-            }
     
             return sons;
         }

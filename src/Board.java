@@ -1,5 +1,4 @@
 import java.util.LinkedList;
-import java.util.Arrays;
 import java.lang.Math;
 
 public class Board {
@@ -120,16 +119,17 @@ public class Board {
 
     public int manhattan(int[][] tiles) {
         int sum = 0;
+        int num;
+        int[] rightPos;
         for(int i = 0; i < Solver.boardSize; i++) {
             for(int j = 0; j < Solver.boardSize; j++) {
 
-                int num;
                 if(tiles[i][j] == 0) // count nothing if is zero
                     continue;
                 else
                     num = tiles[i][j];
 
-                int[] rightPos = getRightPos(num);
+                rightPos = getRightPos(num);
                 sum += Math.abs(rightPos[0] - i) + Math.abs(rightPos[1] - j); 
             }
         }
@@ -146,7 +146,6 @@ public class Board {
         return rightPos;
     }
 
-    //dir: 1 - up, 2 - right, 3 - down, 4 - left
     private Object[] makeMove(int dir) {
 
         int moved = -1;
@@ -173,10 +172,7 @@ public class Board {
         //copy the array
         long[] newctiles = new long[ctiles.length];
 
-        //this method is too slow
-        //System.arraycopy(ctiles, 0, newctiles, 0, ctiles.length);
-
-        //better do it myself
+        //copy the array
         for(int i = 0; i < ctiles.length; i++)
             newctiles[i] = ctiles[i];
 
@@ -187,8 +183,7 @@ public class Board {
         // 4 place : new manhattan
         // 5 place : new linConflit
 
-        //update the conglits
-       switch (dir) {
+        switch (dir) {
            case 1:
                newZeroPos[0] = zeroPos[0] - 1;
                newZeroPos[1] = zeroPos[1];
@@ -215,7 +210,7 @@ public class Board {
        son[1] = newZeroPos;
        son[2] = moved;
 
-       //update new manhattan with the conflits
+        //update new manhattan with the conflits
         int newConflits = 0;
         switch (dir) {
            case 1:
@@ -230,14 +225,14 @@ public class Board {
                break;
         }
         
-       int[] rightPos = getRightPos(moved);
-       if(Math.abs(newZeroPos[0] - rightPos[0]) < Math.abs(zeroPos[0] - rightPos[0])) {
+        int[] rightPos = getRightPos(moved);
+        if(Math.abs(newZeroPos[0] - rightPos[0]) < Math.abs(zeroPos[0] - rightPos[0])) {
             son[3] = manDist + 1;
-       } else if(Math.abs(newZeroPos[1] - rightPos[1]) < Math.abs(zeroPos[1] - rightPos[1])) {
+        } else if(Math.abs(newZeroPos[1] - rightPos[1]) < Math.abs(zeroPos[1] - rightPos[1])) {
             son[3] = manDist + 1;
-       } else {
+        } else {
             son[3] = manDist - 1;
-       }
+        }
 
         son[4] = linConflit + newConflits;
 
@@ -288,7 +283,8 @@ public class Board {
 
         int counter = 0;
         int[] realPos = getRightPos(valToCheck);
-
+        int checkNumb;
+        int[] currentValRightPos;
         if(realPos[1] != column)
             return 0;
 
@@ -298,8 +294,8 @@ public class Board {
                 continue;
 
             //for each value have to check all the value on the right and down
-            int checkNumb = getVal(j, column, newCTiles);
-            int[] currentValRightPos = getRightPos(checkNumb);
+            checkNumb = getVal(j, column, newCTiles);
+            currentValRightPos = getRightPos(checkNumb);
             if(currentValRightPos[1] != column)
                 continue;
                 
@@ -348,6 +344,8 @@ public class Board {
 
         int counter = 0;
         int[] realPos = getRightPos(valToCheck);
+        int checkNumb;
+        int[] currentValRightPos;
 
         if(realPos[0] != row)
             return 0;
@@ -358,8 +356,8 @@ public class Board {
                 continue;
 
             //for each value have to check all the value on the right and down
-            int checkNumb = getVal(row, j, newCTiles);
-            int[] currentValRightPos = getRightPos(checkNumb);
+            checkNumb = getVal(row, j, newCTiles);
+            currentValRightPos = getRightPos(checkNumb);
             if(currentValRightPos[0] != row)
                 continue;
 
@@ -376,24 +374,20 @@ public class Board {
     public LinkedList<Board> getMoves() {
 
         LinkedList<Board> sons = new LinkedList<>();
-        Object[] son;
 
-        //System.out.println("Starting board : \n" + strTiles);
         for(int i = 1; i <= 4; i++) {
             Object[] newSon = makeMove(i);
-            if(newSon != null) {
-                //System.out.println("figlio dir: " +  ((String)newSon[0]));
+
+            if(newSon != null) 
                 sons.push( new Board((long[])newSon[0], (int[])newSon[1], (int)newSon[2], (int)newSon[3], (int)newSon[4]));
-            }
-            //else 
-                //System.out.println("impossible movement dir: " + i);
+
         }
 
         return sons; 
     }
 
-
-    private String getString() {
+    @Override
+    public String toString(){
         StringBuilder bTiles = new StringBuilder();
         for(int i = 0; i < Solver.boardSize; i++) {
             for(int j = 0; j < Solver.boardSize; j++) {
@@ -402,29 +396,11 @@ public class Board {
         }
         bTiles.deleteCharAt(bTiles.length() - 1);
         return bTiles.toString();
-    }
-
-    /*
-    private String getString(long[] c) {
-        StringBuilder bTiles = new StringBuilder();
-        for(int i = 0; i < Solver.boardSize; i++) {
-            for(int j = 0; j < Solver.boardSize; j++) {
-                bTiles.append(getVal(i, j, c) + " ");
-            }
-        }
-        bTiles.deleteCharAt(bTiles.length() - 1);
-        return bTiles.toString();
-    }
-    */
-
-    @Override
-    public String toString(){
-        return getString();
+        //return getString();
     }
 
     @Override
     public boolean equals(Object o) {
-        //return Arrays.equals(ctiles, ((Board)o).getCTiles());
         for(int i = 0; i < ctiles.length; i++)
             if(ctiles[i] != ((Board)o).getCTiles()[i])
                 return false;
@@ -435,5 +411,4 @@ public class Board {
     public int hashCode() {
         return ctiles.hashCode();
     }
-
 }
