@@ -56,6 +56,7 @@ public class Board {
         return ctiles;
     }
 
+    //get a value at the right position in the matrix
     private int getVal(int r, int c, long[] newCTiles) {
 
         long[] board = newCTiles != null ? newCTiles : ctiles;
@@ -70,6 +71,7 @@ public class Board {
         return (int)((getMask(pos) & board[index]) >> (pos * B));
     }
     
+    //set a value in the specified position
     private void setVal(int r, int c, long val, long[] newCTiles) {
 
         long[] board = newCTiles != null ? newCTiles : ctiles;
@@ -293,7 +295,6 @@ public class Board {
             if(j == row)
                 continue;
 
-            //for each value have to check all the value on the right and down
             checkNumb = getVal(j, column, newCTiles);
             currentValRightPos = getRightPos(checkNumb);
             if(currentValRightPos[1] != column)
@@ -316,14 +317,12 @@ public class Board {
         int[] currentValRightPos, otherValRightPos;
         for(int j = 0; j < Solver.boardSize - 1; j ++) {
 
-            //for each value have to check all the value on the right and down
             checkNumb = getVal(row, j, ctiles);
             currentValRightPos = getRightPos(checkNumb);
 
             if(currentValRightPos[0] != row)
                 continue;
             
-            //System.out.println("current val" + getVal(i, j, baord));
             for(int c = 1; c < Solver.boardSize - j; c++) {
                 toCheckNumbWith = getVal(row, j + c, ctiles);
                 otherValRightPos = getRightPos(toCheckNumbWith);
@@ -355,7 +354,6 @@ public class Board {
             if(j == column)
                 continue;
 
-            //for each value have to check all the value on the right and down
             checkNumb = getVal(row, j, newCTiles);
             currentValRightPos = getRightPos(checkNumb);
             if(currentValRightPos[0] != row)
@@ -396,7 +394,6 @@ public class Board {
         }
         bTiles.deleteCharAt(bTiles.length() - 1);
         return bTiles.toString();
-        //return getString();
     }
 
     @Override

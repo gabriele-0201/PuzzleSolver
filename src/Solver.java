@@ -34,6 +34,7 @@ public class Solver {
 
         Solver solve = new Solver();
 
+        //start solving
         solve.solveBoard(boardInputString);
 
     }
@@ -46,6 +47,7 @@ public class Solver {
 
         boolean endFound = false;
 
+        //create the hashmap with (key : board - val : Node)
         HashMap<Board, Node> nodeMap = new HashMap<>();
 
         //Create the first node with zero moves
@@ -53,16 +55,20 @@ public class Solver {
         
         endFound = node.checkEnd();;
 
+        //create the priority queue
         PriorityQueue<Node> que = new PriorityQueue<>();;
         que.add(node);
         nodeMap.put(node.getBoard(), node);
         
+        //loop until end is found
         while(!endFound) {
             
+            //get the closest board to the end
             node = que.poll();
 
             LinkedList<Node> sons = node.getSons();
 
+            //create all sons
             for(Node s : sons) {
 
                 Object tmp;
@@ -88,8 +94,8 @@ public class Solver {
                 } 
             }
         }
-        
-        System.out.println();
+
+        //print the number of moves and the boards
 
         System.out.println(node.getMoves());
 
@@ -111,7 +117,7 @@ public class Solver {
         int i = 0;
         int j = 0;
         for(String c : chars) {
-            tiles[i][j++] = Short.parseShort(c);
+            tiles[i][j++] = Integer.parseInt(c);
 
             if(j >= Solver.boardSize) {
                 i++;
