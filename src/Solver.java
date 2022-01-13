@@ -34,6 +34,7 @@ public class Solver {
 
         Solver solve = new Solver();
 
+        //start solving
         solve.solveBoard(boardInputString);
 
     }
@@ -46,26 +47,28 @@ public class Solver {
 
         boolean endFound = false;
 
+        //create the hashmap with (key : board - val : Node)
         HashMap<Board, Node> nodeMap = new HashMap<>();
-        //HashMap<long[], Board> nodeMap = new HashMap<>();
 
         //Create the first node with zero moves
         Node node = new Node(strBoard, null, 0); 
         
         endFound = node.checkEnd();;
 
+        //create the priority queue
         PriorityQueue<Node> que = new PriorityQueue<>();;
         que.add(node);
         nodeMap.put(node.getBoard(), node);
         
-        int i = 0;
-
+        //loop until end is found
         while(!endFound) {
             
+            //get the closest board to the end
             node = que.poll();
 
             LinkedList<Node> sons = node.getSons();
 
+            //create all sons
             for(Node s : sons) {
 
                 Object tmp;
@@ -74,8 +77,7 @@ public class Solver {
                     if(((Node)tmp).getMoves() > s.getMoves()) {
 
                         nodeMap.put(s.getBoard(), s);
-
-                        //que.remove((Node)tmp);
+                        que.remove((Node)tmp);
                         que.add(s);
 
                     }
@@ -92,8 +94,8 @@ public class Solver {
                 } 
             }
         }
-        
-        System.out.println();
+
+        //print the number of moves and the boards
 
         System.out.println(node.getMoves());
 
@@ -115,7 +117,7 @@ public class Solver {
         int i = 0;
         int j = 0;
         for(String c : chars) {
-            tiles[i][j++] = Short.parseShort(c);
+            tiles[i][j++] = Integer.parseInt(c);
 
             if(j >= Solver.boardSize) {
                 i++;
@@ -165,7 +167,6 @@ public class Solver {
     
         public boolean checkEnd() {
             return this.board.getManDist() == 0;
-            //return Arrays.equals(Board.endBoard, this.board.getCTiles());
         }
     
         @Override
@@ -180,18 +181,15 @@ public class Solver {
     
         public LinkedList<Node> getSons() {
             LinkedList<Node> sons = new LinkedList<>();
+
             //get a list with all the son of the current board
             LinkedList<Board> moves = board.getMoves();
     
-            //adding one move for the all the son
+            //adding one move for the all the sons
             int sonsMoves = this.moves + 1;
     
-            //System.out.println("Dead: " + board + " manhattan: " + board.getManDist());
-    
-            for(int i = 0; i < moves.size(); i++) {
+            for(int i = 0; i < moves.size(); i++)
                 sons.add(new Node(moves.get(i), this, sonsMoves));
-                //System.out.println("Son: " + moves.get(i) + " manhattan: " + (moves.get(i).getManDist() + moves.get(i).getLinConflit() + sonsMoves));
-            }
     
             return sons;
         }
